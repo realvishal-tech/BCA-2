@@ -7,63 +7,168 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main class="page">
-    <div class="container">
-      <section class="card">
-        <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:flex-start; margin-bottom: 18px;">
-          <div>
-            <h1>Admin Panel</h1>
-            <p>Manage study materials in localStorage and keep the user dashboard updated.</p>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h2>⚙️ Admin Hub</h2>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="admin-dashboard.html" class="nav-item active">
+          <span class="nav-icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="#materials" class="nav-item">
+          <span class="nav-icon">📚</span>
+          <span>Materials</span>
+        </a>
+        <a href="#settings" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-secondary" id="logoutBtn" style="width: 100%; margin-bottom: 0;">
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Top Navbar -->
+    <nav class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" id="menuToggle">☰</button>
+        <span class="topbar-title">Admin Panel</span>
+      </div>
+
+      <div class="topbar-right">
+        <div class="user-info">
+          <div class="user-avatar">👤</div>
+          <div class="user-details">
+            <div class="user-name">Administrator</div>
+            <div class="user-role">Admin</div>
           </div>
-          <button class="secondary" id="logoutBtn">Logout</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div id="alertContainer"></div>
+
+      <!-- Welcome Section -->
+      <div class="welcome-card">
+        <div class="welcome-title">Welcome to Admin Panel 👋</div>
+        <div class="welcome-subtitle">
+          Manage study materials for your students. Add new resources or remove outdated ones.
+        </div>
+      </div>
+
+      <!-- Add Material Form -->
+      <div class="card grid-full">
+        <div class="card-header">
+          <div class="card-title">➕ Add New Material</div>
         </div>
 
-        <div id="alertContainer"></div>
-
-        <form id="materialForm" class="form-group">
-          <div class="form-group">
-            <label for="title">Material Title</label>
-            <input type="text" id="title" name="title" placeholder="Enter link title" autocomplete="off" />
+        <form id="materialForm" class="add-material-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="title">Material Title</label>
+              <input 
+                type="text" 
+                id="title" 
+                placeholder="e.g., JavaScript Tutorial" 
+                autocomplete="off"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="url">Material URL</label>
+              <input 
+                type="url" 
+                id="url" 
+                placeholder="https://example.com" 
+                autocomplete="off"
+                required
+              />
+            </div>
           </div>
-          <div class="form-group">
-            <label for="url">Material URL</label>
-            <input type="url" id="url" name="url" placeholder="Enter URL starting with https://" autocomplete="off" />
+          <div class="action-buttons">
+            <button type="submit" class="btn btn-primary" style="width: auto; flex: 1; max-width: 150px;">
+              Add Material
+            </button>
+            <button type="reset" class="btn btn-secondary" style="width: auto; flex: 1; max-width: 150px;">
+              Clear
+            </button>
           </div>
-          <button type="submit">Add Material</button>
         </form>
+      </div>
 
-        <div class="list-card" id="materialsList"></div>
-      </section>
-    </div>
-  </main>
+      <!-- Page Header -->
+      <div class="page-header" style="margin-top: 32px;">
+        <h1>📚 Study Materials Library</h1>
+        <p>Manage and organize all study materials</p>
+      </div>
+
+      <!-- Materials List -->
+      <div id="materialsList" class="grid"></div>
+    </main>
+  </div>
+
+  <!-- Mobile Sidebar Toggle Float Button -->
+  <button class="toggle-sidebar" id="toggleSidebarBtn">☰</button>
 
   <script src="app.js"></script>
   <script>
-    const materialsList = document.getElementById('materialsList');
-    const materialForm = document.getElementById('materialForm');
-    const alertContainer = document.getElementById('alertContainer');
+    const sidebar = document.querySelector('.sidebar');
+    const menuToggle = document.getElementById('menuToggle');
+    const toggleBtn = document.getElementById('toggleSidebarBtn');
     const logoutBtn = document.getElementById('logoutBtn');
+    const materialForm = document.getElementById('materialForm');
+    const materialsList = document.getElementById('materialsList');
+    const alertContainer = document.getElementById('alertContainer');
 
+    // Check admin login
     if (!ensureAdminLoggedIn()) {
       return;
     }
 
+    // Menu toggle
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+
+    // Close sidebar when clicking on a nav item
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+      });
+    });
+
+    // Logout
     logoutBtn.addEventListener('click', () => {
       logoutAdmin();
     });
 
+    // Add material
     materialForm.addEventListener('submit', (event) => {
       event.preventDefault();
       const title = document.getElementById('title').value.trim();
       const url = document.getElementById('url').value.trim();
 
       if (!title || !url) {
-        showAlert(alertContainer, 'Both title and URL are required.', 'error');
+        showAlert(alertContainer, '⚠️ Please fill in all fields', 'error');
         return;
       }
 
       if (!/^https?:\/\//i.test(url)) {
-        showAlert(alertContainer, 'Please enter a valid URL starting with http:// or https://.', 'error');
+        showAlert(alertContainer, '❌ URL must start with http:// or https://', 'error');
         return;
       }
 
@@ -71,53 +176,76 @@
       materials.push({ title, url });
       saveMaterials(materials);
       materialForm.reset();
-      showAlert(alertContainer, 'Material added successfully.', 'success');
+      document.getElementById('title').focus();
+      
+      showAlert(alertContainer, '✓ Material added successfully', 'success');
       renderMaterials();
     });
 
+    // Delete material
     function handleDelete(index) {
-      const materials = getMaterials();
-      materials.splice(index, 1);
-      saveMaterials(materials);
-      showAlert(alertContainer, 'Material removed successfully.', 'success');
-      renderMaterials();
+      if (confirm('Are you sure you want to delete this material?')) {
+        const materials = getMaterials();
+        materials.splice(index, 1);
+        saveMaterials(materials);
+        showAlert(alertContainer, '✓ Material deleted successfully', 'success');
+        renderMaterials();
+      }
     }
 
+    // Render materials
     function renderMaterials() {
       const materials = getMaterials();
       materialsList.innerHTML = '';
 
       if (materials.length === 0) {
-        materialsList.innerHTML = '<p style="color: var(--muted);">No materials are available. Add one using the form above.</p>';
+        materialsList.innerHTML = `
+          <div class="card grid-full" style="text-align: center; padding: 60px 32px;">
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 8px;">📭 No materials added yet</p>
+            <p style="color: var(--text-muted); font-size: 12px;">Add study materials using the form above</p>
+          </div>
+        `;
         return;
       }
 
       materials.forEach((item, index) => {
         const materialCard = document.createElement('div');
-        materialCard.className = 'material-item';
-
+        materialCard.className = 'card';
         materialCard.innerHTML = `
-          <div>
-            <a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.title}</a>
-            <p style="margin: 8px 0 0; color: var(--muted); font-size: 0.95rem;">${item.url}</p>
-          </div>
-          <div class="controls">
-            <button type="button" class="danger" data-index="${index}">Delete</button>
+          <div class="material-item">
+            <div class="material-info">
+              <div class="material-title">📖 ${item.title}</div>
+              <div class="material-url">${item.url}</div>
+            </div>
+            <div class="material-actions">
+              <button type="button" class="btn-icon btn-open" title="Open in new tab">
+                🔗
+              </button>
+              <button type="button" class="btn-icon btn-delete" title="Delete" data-index="${index}">
+                🗑️
+              </button>
+            </div>
           </div>
         `;
 
-        materialsList.appendChild(materialCard);
-      });
+        materialCard.querySelector('.btn-open').addEventListener('click', () => {
+          window.open(item.url, '_blank');
+        });
 
-      materialsList.querySelectorAll('.danger').forEach((button) => {
-        button.addEventListener('click', () => {
-          const index = Number(button.dataset.index);
+        materialCard.querySelector('.btn-delete').addEventListener('click', () => {
           handleDelete(index);
         });
+
+        materialsList.appendChild(materialCard);
       });
     }
 
     renderMaterials();
+
+    // Listen for changes from other tabs
+    window.addEventListener('storage', () => {
+      renderMaterials();
+    });
   </script>
 </body>
 </html>

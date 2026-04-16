@@ -3,30 +3,37 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Study Portal | Login</title>
+  <title>Study Portal | Student Login</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-  <main class="page">
-    <div class="container">
-      <section class="card">
-        <h1>Welcome back!</h1>
-        <p>Enter your name to access your study dashboard.</p>
+<body class="login-page">
+  <div class="login-container">
+    <div class="login-card">
+      <h1>📚 Study Portal</h1>
+      <p>LND College | BCA 2nd Semester</p>
 
-        <div id="alertContainer"></div>
+      <div id="alertContainer"></div>
 
-        <form id="loginForm">
-          <div class="form-group">
-            <label for="username">Your Name</label>
-            <input type="text" id="username" name="username" placeholder="Type your name" autocomplete="off" />
-          </div>
-          <button type="submit">Continue</button>
-        </form>
+      <form id="loginForm" class="login-form">
+        <div class="form-group">
+          <label for="username">Full Name</label>
+          <input 
+            type="text" 
+            id="username" 
+            name="username" 
+            placeholder="Enter your full name" 
+            autocomplete="off"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Enter Dashboard</button>
+      </form>
 
-        <p style="margin-top: 24px; color: var(--muted);">Admin? <a href="admin.html">Login here</a></p>
-      </section>
+      <div class="login-footer">
+        <p>Are you an admin? <a href="admin.html">Admin Login →</a></p>
+      </div>
     </div>
-  </main>
+  </div>
 
   <script src="app.js"></script>
   <script>
@@ -36,15 +43,18 @@
     loginForm.addEventListener('submit', (event) => {
       event.preventDefault();
       const username = document.getElementById('username').value.trim();
+      
       if (!username) {
-        showAlert(alertContainer, 'Please enter your name before continuing.', 'error');
+        showAlert(alertContainer, '⚠️ Please enter your name', 'error');
         return;
       }
+      
       localStorage.setItem(STORAGE_USER_KEY, username);
-      showAlert(alertContainer, 'Login successful! Redirecting...', 'success');
+      showAlert(alertContainer, '✓ Welcome! Redirecting...', 'success');
+      
       setTimeout(() => {
         location.href = 'dashboard.html';
-      }, 700);
+      }, 800);
     });
   </script>
 </body>

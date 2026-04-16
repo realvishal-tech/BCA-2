@@ -7,63 +7,167 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main class="page">
-    <div class="container">
-      <section class="card">
-        <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:flex-start; margin-bottom: 18px;">
-          <div>
-            <h1 id="welcomeTitle">Hello!</h1>
-            <p>Access your saved study materials and open them in a new tab.</p>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h2>📚 StudyHub</h2>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item active">
+          <span class="nav-icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="#materials" class="nav-item">
+          <span class="nav-icon">📖</span>
+          <span>Materials</span>
+        </a>
+        <a href="#notes" class="nav-item">
+          <span class="nav-icon">📝</span>
+          <span>Notes</span>
+        </a>
+        <a href="#links" class="nav-item">
+          <span class="nav-icon">🔗</span>
+          <span>Resources</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-secondary" id="logoutBtn" style="width: 100%; margin-bottom: 0;">
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Top Navbar -->
+    <nav class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" id="menuToggle">☰</button>
+        <span class="topbar-title">Dashboard</span>
+      </div>
+
+      <div class="topbar-right">
+        <div class="user-info">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-details">
+            <div class="user-name" id="userName">User</div>
+            <div class="user-role">Student</div>
           </div>
-          <button class="secondary" id="logoutBtn">Logout</button>
         </div>
+      </div>
+    </nav>
 
-        <div id="alertContainer"></div>
+    <!-- Main Content -->
+    <main class="main-content">
+      <div id="alertContainer"></div>
 
-        <div class="list-card" id="materialsList"></div>
-      </section>
-    </div>
-  </main>
+      <!-- Welcome Section -->
+      <div class="welcome-card">
+        <div class="welcome-title">Welcome back, <span id="welcomeName">User</span>! 👋</div>
+        <div class="welcome-subtitle">
+          Access your study materials, notes, and resources all in one place. Keep learning and growing!
+        </div>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1>Study Materials</h1>
+        <p>Click on any material to open it in a new tab</p>
+      </div>
+
+      <!-- Materials Grid -->
+      <div id="materialsList" class="grid"></div>
+    </main>
+  </div>
+
+  <!-- Mobile Sidebar Toggle Float Button -->
+  <button class="toggle-sidebar" id="toggleSidebarBtn">☰</button>
 
   <script src="app.js"></script>
   <script>
+    const sidebar = document.querySelector('.sidebar');
+    const menuToggle = document.getElementById('menuToggle');
+    const toggleBtn = document.getElementById('toggleSidebarBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
     const materialsList = document.getElementById('materialsList');
     const alertContainer = document.getElementById('alertContainer');
-    const logoutBtn = document.getElementById('logoutBtn');
 
+    // Check user login
     const user = ensureUserLoggedIn();
     if (user) {
-      document.getElementById('welcomeTitle').textContent = `Welcome, ${user}!`;
+      document.getElementById('userName').textContent = user;
+      document.getElementById('welcomeName').textContent = user;
+      document.getElementById('userAvatar').textContent = user.charAt(0).toUpperCase();
     }
 
+    // Menu toggle
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+
+    // Close sidebar when clicking on a nav item
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+      });
+    });
+
+    // Logout
     logoutBtn.addEventListener('click', () => {
       logoutUser();
     });
 
+    // Render materials
     function renderMaterials() {
       const materials = getMaterials();
       materialsList.innerHTML = '';
 
       if (materials.length === 0) {
-        materialsList.innerHTML = '<p style="color: var(--muted);">No study materials have been added yet. Ask the admin to add links.</p>';
+        materialsList.innerHTML = `
+          <div class="card grid-full" style="text-align: center; padding: 60px 32px;">
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 8px;">📭 No materials yet</p>
+            <p style="color: var(--text-muted); font-size: 12px;">Ask your admin to add study materials</p>
+          </div>
+        `;
         return;
       }
 
       materials.forEach((item) => {
-        const materialCard = document.createElement('div');
-        materialCard.className = 'material-item';
-
-        materialCard.innerHTML = `
-          <div>
-            <a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.title}</a>
-            <p style="margin: 8px 0 0; color: var(--muted); font-size: 0.95rem;">${item.url}</p>
+        const materialItem = document.createElement('div');
+        materialItem.className = 'card';
+        materialItem.innerHTML = `
+          <div class="material-item">
+            <div class="material-info">
+              <div class="material-title">📚 ${item.title}</div>
+              <div class="material-url">${item.url}</div>
+            </div>
+            <div class="material-actions">
+              <button class="btn-icon btn-open" title="Open">
+                🔗
+              </button>
+            </div>
           </div>
         `;
-        materialsList.appendChild(materialCard);
+
+        materialItem.querySelector('.btn-open').addEventListener('click', () => {
+          window.open(item.url, '_blank');
+        });
+
+        materialsList.appendChild(materialItem);
       });
     }
 
     renderMaterials();
+
+    // Listen for storage changes (real-time update from admin panel)
+    window.addEventListener('storage', () => {
+      renderMaterials();
+    });
   </script>
 </body>
 </html>
