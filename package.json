@@ -1,0 +1,21 @@
+{
+  "name": "study-portal",
+  "version": "1.0.0",
+  "description": "A simple study portal with user and admin dashboards",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "study",
+    "portal",
+    "dashboard",
+    "admin"
+  ],
+  "author": "Study Portal Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

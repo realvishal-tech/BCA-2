@@ -1,0 +1,7 @@
+{
+  "buildCommand": "",
+  "installCommand": "",
+  "env": {
+    "VERCEL_ENV": "production"
+  }
+}
