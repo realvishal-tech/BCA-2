@@ -19,17 +19,17 @@
           <span class="nav-icon">📊</span>
           <span>Dashboard</span>
         </a>
-        <a href="#materials" class="nav-item">
-          <span class="nav-icon">📖</span>
-          <span>Materials</span>
-        </a>
         <a href="#notes" class="nav-item">
           <span class="nav-icon">📝</span>
           <span>Notes</span>
         </a>
         <a href="#links" class="nav-item">
           <span class="nav-icon">🔗</span>
-          <span>Resources</span>
+          <span>Links</span>
+        </a>
+        <a href="#materials" class="nav-item">
+          <span class="nav-icon">📖</span>
+          <span>Materials</span>
         </a>
       </nav>
 
@@ -66,18 +66,45 @@
       <div class="welcome-card">
         <div class="welcome-title">Welcome back, <span id="welcomeName">User</span>! 👋</div>
         <div class="welcome-subtitle">
-          Access your study materials, notes, and resources all in one place. Keep learning and growing!
+          Explore your study notes, important links, and materials all organized in one place.
         </div>
       </div>
 
-      <!-- Page Header -->
-      <div class="page-header">
-        <h1>Study Materials</h1>
-        <p>Click on any material to open it in a new tab</p>
+      <!-- Notes Category -->
+      <div class="category-section" id="notesSection">
+        <div class="category-header">
+          <div class="category-icon">📝</div>
+          <div class="category-title">Study Notes</div>
+          <div class="category-count">
+            <span id="notesCount">0</span> notes
+          </div>
+        </div>
+        <div class="category-grid" id="notesList"></div>
       </div>
 
-      <!-- Materials Grid -->
-      <div id="materialsList" class="grid"></div>
+      <!-- Important Links Category -->
+      <div class="category-section" id="linksSection">
+        <div class="category-header">
+          <div class="category-icon">🔗</div>
+          <div class="category-title">Important Links</div>
+          <div class="category-count">
+            <span id="linksCount">0</span> links
+          </div>
+        </div>
+        <div class="category-grid" id="linksList"></div>
+      </div>
+
+      <!-- Study Materials Category -->
+      <div class="category-section" id="materialsSection">
+        <div class="category-header">
+          <div class="category-icon">📖</div>
+          <div class="category-title">Study Materials</div>
+          <div class="category-count">
+            <span id="materialsCount">0</span> materials
+          </div>
+        </div>
+        <div class="category-grid" id="materialsList"></div>
+      </div>
     </main>
   </div>
 
@@ -90,7 +117,6 @@
     const menuToggle = document.getElementById('menuToggle');
     const toggleBtn = document.getElementById('toggleSidebarBtn');
     const logoutBtn = document.getElementById('logoutBtn');
-    const materialsList = document.getElementById('materialsList');
     const alertContainer = document.getElementById('alertContainer');
 
     // Check user login
@@ -122,51 +148,57 @@
       logoutUser();
     });
 
-    // Render materials
-    function renderMaterials() {
-      const materials = getMaterials();
-      materialsList.innerHTML = '';
+    // Render category resources
+    function renderCategory(items, containerId, countId, emptyMessage = '') {
+      const container = document.getElementById(containerId);
+      const countEl = document.getElementById(countId);
+      
+      countEl.textContent = items.length;
+      container.innerHTML = '';
 
-      if (materials.length === 0) {
-        materialsList.innerHTML = `
-          <div class="card grid-full" style="text-align: center; padding: 60px 32px;">
-            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 8px;">📭 No materials yet</p>
-            <p style="color: var(--text-muted); font-size: 12px;">Ask your admin to add study materials</p>
+      if (items.length === 0) {
+        const category = containerId.replace('List', '');
+        const emoji = category === 'notes' ? '📝' : category === 'links' ? '🔗' : '📖';
+        container.innerHTML = `
+          <div class="category-empty">
+            <div class="category-empty-icon">${emoji}</div>
+            <p>No items added yet</p>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">Admin will add resources soon</p>
           </div>
         `;
         return;
       }
 
-      materials.forEach((item) => {
-        const materialItem = document.createElement('div');
-        materialItem.className = 'card';
-        materialItem.innerHTML = `
-          <div class="material-item">
-            <div class="material-info">
-              <div class="material-title">📚 ${item.title}</div>
-              <div class="material-url">${item.url}</div>
-            </div>
-            <div class="material-actions">
-              <button class="btn-icon btn-open" title="Open">
-                🔗
-              </button>
-            </div>
-          </div>
-        `;
+      items.forEach((item) => {
+        const card = createPreviewCard(item, '', -1);
+        card.querySelector('.btn-preview-delete').style.display = 'none';
+        container.appendChild(card);
+      });
 
-        materialItem.querySelector('.btn-open').addEventListener('click', () => {
-          window.open(item.url, '_blank');
+      // Add open link functionality
+      container.querySelectorAll('.btn-preview-open').forEach(btn => {
+        btn.addEventListener('click', () => {
+          window.open(btn.dataset.url, '_blank');
         });
-
-        materialsList.appendChild(materialItem);
       });
     }
 
-    renderMaterials();
+    // Initial render
+    function renderAllCategories() {
+      const notes = getNotes();
+      const links = getImportantLinks();
+      const materials = getStudyMaterials();
+
+      renderCategory(notes, 'notesList', 'notesCount');
+      renderCategory(links, 'linksList', 'linksCount');
+      renderCategory(materials, 'materialsList', 'materialsCount');
+    }
+
+    renderAllCategories();
 
     // Listen for storage changes (real-time update from admin panel)
     window.addEventListener('storage', () => {
-      renderMaterials();
+      renderAllCategories();
     });
   </script>
 </body>

@@ -19,13 +19,17 @@
           <span class="nav-icon">📊</span>
           <span>Dashboard</span>
         </a>
-        <a href="#materials" class="nav-item">
-          <span class="nav-icon">📚</span>
-          <span>Materials</span>
+        <a href="#notes" class="nav-item">
+          <span class="nav-icon">📝</span>
+          <span>Notes</span>
         </a>
-        <a href="#settings" class="nav-item">
-          <span class="nav-icon">⚙️</span>
-          <span>Settings</span>
+        <a href="#links" class="nav-item">
+          <span class="nav-icon">🔗</span>
+          <span>Links</span>
+        </a>
+        <a href="#materials" class="nav-item">
+          <span class="nav-icon">📖</span>
+          <span>Materials</span>
         </a>
       </nav>
 
@@ -60,60 +64,164 @@
 
       <!-- Welcome Section -->
       <div class="welcome-card">
-        <div class="welcome-title">Welcome to Admin Panel 👋</div>
+        <div class="welcome-title">Admin Control Panel 🎛️</div>
         <div class="welcome-subtitle">
-          Manage study materials for your students. Add new resources or remove outdated ones.
+          Manage study notes, important links, and materials. All changes will be reflected instantly on student dashboards.
         </div>
       </div>
 
-      <!-- Add Material Form -->
-      <div class="card grid-full">
-        <div class="card-header">
-          <div class="card-title">➕ Add New Material</div>
+      <!-- ==================== NOTES SECTION ==================== -->
+      <div class="category-section" id="notesSection">
+        <div class="category-header">
+          <div class="category-icon">📝</div>
+          <div class="category-title">Study Notes</div>
         </div>
 
-        <form id="materialForm" class="add-material-form">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="title">Material Title</label>
-              <input 
-                type="text" 
-                id="title" 
-                placeholder="e.g., JavaScript Tutorial" 
-                autocomplete="off"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label for="url">Material URL</label>
-              <input 
-                type="url" 
-                id="url" 
-                placeholder="https://example.com" 
-                autocomplete="off"
-                required
-              />
-            </div>
+        <!-- Add Notes Form -->
+        <div class="card grid-full" style="margin-bottom: 24px;">
+          <div class="card-header">
+            <div class="card-title">➕ Add New Note</div>
           </div>
-          <div class="action-buttons">
-            <button type="submit" class="btn btn-primary" style="width: auto; flex: 1; max-width: 150px;">
-              Add Material
-            </button>
-            <button type="reset" class="btn btn-secondary" style="width: auto; flex: 1; max-width: 150px;">
-              Clear
-            </button>
-          </div>
-        </form>
+
+          <form id="notesForm" class="add-material-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="notesTitle">Note Title</label>
+                <input 
+                  type="text" 
+                  id="notesTitle" 
+                  placeholder="e.g., Class 5 - JavaScript Basics" 
+                  autocomplete="off"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="notesUrl">Note URL</label>
+                <input 
+                  type="url" 
+                  id="notesUrl" 
+                  placeholder="https://example.com" 
+                  autocomplete="off"
+                  required
+                />
+              </div>
+            </div>
+            <div class="action-buttons">
+              <button type="submit" class="btn btn-primary" style="width: auto; flex: 1; max-width: 150px;">
+                Add Note
+              </button>
+              <button type="reset" class="btn btn-secondary" style="width: auto; flex: 1; max-width: 150px;">
+                Clear
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Notes List -->
+        <div class="category-grid" id="notesList"></div>
       </div>
 
-      <!-- Page Header -->
-      <div class="page-header" style="margin-top: 32px;">
-        <h1>📚 Study Materials Library</h1>
-        <p>Manage and organize all study materials</p>
+      <!-- ==================== IMPORTANT LINKS SECTION ==================== -->
+      <div class="category-section" id="linksSection">
+        <div class="category-header">
+          <div class="category-icon">🔗</div>
+          <div class="category-title">Important Links</div>
+        </div>
+
+        <!-- Add Links Form -->
+        <div class="card grid-full" style="margin-bottom: 24px;">
+          <div class="card-header">
+            <div class="card-title">➕ Add New Link</div>
+          </div>
+
+          <form id="linksForm" class="add-material-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="linksTitle">Link Title</label>
+                <input 
+                  type="text" 
+                  id="linksTitle" 
+                  placeholder="e.g., Official Course Website" 
+                  autocomplete="off"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="linksUrl">Link URL</label>
+                <input 
+                  type="url" 
+                  id="linksUrl" 
+                  placeholder="https://example.com" 
+                  autocomplete="off"
+                  required
+                />
+              </div>
+            </div>
+            <div class="action-buttons">
+              <button type="submit" class="btn btn-primary" style="width: auto; flex: 1; max-width: 150px;">
+                Add Link
+              </button>
+              <button type="reset" class="btn btn-secondary" style="width: auto; flex: 1; max-width: 150px;">
+                Clear
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Links List -->
+        <div class="category-grid" id="linksList"></div>
       </div>
 
-      <!-- Materials List -->
-      <div id="materialsList" class="grid"></div>
+      <!-- ==================== STUDY MATERIALS SECTION ==================== -->
+      <div class="category-section" id="materialsSection">
+        <div class="category-header">
+          <div class="category-icon">📖</div>
+          <div class="category-title">Study Materials</div>
+        </div>
+
+        <!-- Add Materials Form -->
+        <div class="card grid-full" style="margin-bottom: 24px;">
+          <div class="card-header">
+            <div class="card-title">➕ Add New Material</div>
+          </div>
+
+          <form id="materialsForm" class="add-material-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="materialsTitle">Material Title</label>
+                <input 
+                  type="text" 
+                  id="materialsTitle" 
+                  placeholder="e.g., Complete JavaScript Tutorial" 
+                  autocomplete="off"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="materialsUrl">Material URL</label>
+                <input 
+                  type="url" 
+                  id="materialsUrl" 
+                  placeholder="https://example.com" 
+                  autocomplete="off"
+                  required
+                />
+              </div>
+            </div>
+            <div class="action-buttons">
+              <button type="submit" class="btn btn-primary" style="width: auto; flex: 1; max-width: 150px;">
+                Add Material
+              </button>
+              <button type="reset" class="btn btn-secondary" style="width: auto; flex: 1; max-width: 150px;">
+                Clear
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Materials List -->
+        <div class="category-grid" id="materialsList"></div>
+      </div>
     </main>
   </div>
 
@@ -126,8 +234,6 @@
     const menuToggle = document.getElementById('menuToggle');
     const toggleBtn = document.getElementById('toggleSidebarBtn');
     const logoutBtn = document.getElementById('logoutBtn');
-    const materialForm = document.getElementById('materialForm');
-    const materialsList = document.getElementById('materialsList');
     const alertContainer = document.getElementById('alertContainer');
 
     // Check admin login
@@ -156,11 +262,13 @@
       logoutAdmin();
     });
 
-    // Add material
-    materialForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const title = document.getElementById('title').value.trim();
-      const url = document.getElementById('url').value.trim();
+    // ==================== NOTES MANAGEMENT ====================
+    const notesForm = document.getElementById('notesForm');
+
+    notesForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = document.getElementById('notesTitle').value.trim();
+      const url = document.getElementById('notesUrl').value.trim();
 
       if (!title || !url) {
         showAlert(alertContainer, '⚠️ Please fill in all fields', 'error');
@@ -172,79 +280,136 @@
         return;
       }
 
-      const materials = getMaterials();
-      materials.push({ title, url });
-      saveMaterials(materials);
-      materialForm.reset();
-      document.getElementById('title').focus();
-      
-      showAlert(alertContainer, '✓ Material added successfully', 'success');
-      renderMaterials();
+      addToCategory('notes', { title, url });
+      notesForm.reset();
+      document.getElementById('notesTitle').focus();
+      showAlert(alertContainer, '✓ Note added successfully', 'success');
+      renderAllCategories();
     });
 
-    // Delete material
-    function handleDelete(index) {
-      if (confirm('Are you sure you want to delete this material?')) {
-        const materials = getMaterials();
-        materials.splice(index, 1);
-        saveMaterials(materials);
-        showAlert(alertContainer, '✓ Material deleted successfully', 'success');
-        renderMaterials();
+    // ==================== LINKS MANAGEMENT ====================
+    const linksForm = document.getElementById('linksForm');
+
+    linksForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = document.getElementById('linksTitle').value.trim();
+      const url = document.getElementById('linksUrl').value.trim();
+
+      if (!title || !url) {
+        showAlert(alertContainer, '⚠️ Please fill in all fields', 'error');
+        return;
+      }
+
+      if (!/^https?:\/\//i.test(url)) {
+        showAlert(alertContainer, '❌ URL must start with http:// or https://', 'error');
+        return;
+      }
+
+      addToCategory('links', { title, url });
+      linksForm.reset();
+      document.getElementById('linksTitle').focus();
+      showAlert(alertContainer, '✓ Link added successfully', 'success');
+      renderAllCategories();
+    });
+
+    // ==================== MATERIALS MANAGEMENT ====================
+    const materialsForm = document.getElementById('materialsForm');
+
+    materialsForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = document.getElementById('materialsTitle').value.trim();
+      const url = document.getElementById('materialsUrl').value.trim();
+
+      if (!title || !url) {
+        showAlert(alertContainer, '⚠️ Please fill in all fields', 'error');
+        return;
+      }
+
+      if (!/^https?:\/\//i.test(url)) {
+        showAlert(alertContainer, '❌ URL must start with http:// or https://', 'error');
+        return;
+      }
+
+      addToCategory('materials', { title, url });
+      materialsForm.reset();
+      document.getElementById('materialsTitle').focus();
+      showAlert(alertContainer, '✓ Material added successfully', 'success');
+      renderAllCategories();
+    });
+
+    // Delete item from category
+    function handleDelete(category, index) {
+      if (confirm('Are you sure you want to delete this item?')) {
+        removeFromCategory(category, index);
+        showAlert(alertContainer, '✓ Item deleted successfully', 'success');
+        renderAllCategories();
       }
     }
 
-    // Render materials
-    function renderMaterials() {
-      const materials = getMaterials();
-      materialsList.innerHTML = '';
+    // Render category
+    function renderCategoryGrid(items, containerId, category) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
 
-      if (materials.length === 0) {
-        materialsList.innerHTML = `
-          <div class="card grid-full" style="text-align: center; padding: 60px 32px;">
-            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 8px;">📭 No materials added yet</p>
-            <p style="color: var(--text-muted); font-size: 12px;">Add study materials using the form above</p>
+      if (items.length === 0) {
+        const iconMap = { notes: '📝', links: '🔗', materials: '📖' };
+        container.innerHTML = `
+          <div class="category-empty">
+            <div class="category-empty-icon">${iconMap[category]}</div>
+            <p>No items in this category yet</p>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">Add your first item using the form above</p>
           </div>
         `;
         return;
       }
 
-      materials.forEach((item, index) => {
-        const materialCard = document.createElement('div');
-        materialCard.className = 'card';
-        materialCard.innerHTML = `
-          <div class="material-item">
-            <div class="material-info">
-              <div class="material-title">📖 ${item.title}</div>
-              <div class="material-url">${item.url}</div>
+      items.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'preview-card';
+        card.innerHTML = `
+          <div class="preview-header">
+            <div class="preview-favicon">
+              <img src="https://www.google.com/s2/favicons?domain=${getDomainName(item.url)}&sz=32" alt="favicon" onerror="this.src='🔗'">
             </div>
-            <div class="material-actions">
-              <button type="button" class="btn-icon btn-open" title="Open in new tab">
-                🔗
-              </button>
-              <button type="button" class="btn-icon btn-delete" title="Delete" data-index="${index}">
-                🗑️
-              </button>
+            <div class="preview-meta">
+              <div class="preview-title">${item.title}</div>
+              <div class="preview-domain">${getDomainName(item.url)}</div>
             </div>
+          </div>
+          <div class="preview-actions">
+            <button class="btn-preview-open" data-url="${item.url}" title="Open link">🔗</button>
+            <button class="btn-preview-delete" data-category="${category}" data-index="${index}" title="Delete item">🗑️</button>
           </div>
         `;
 
-        materialCard.querySelector('.btn-open').addEventListener('click', () => {
+        card.querySelector('.btn-preview-open').addEventListener('click', () => {
           window.open(item.url, '_blank');
         });
 
-        materialCard.querySelector('.btn-delete').addEventListener('click', () => {
-          handleDelete(index);
+        card.querySelector('.btn-preview-delete').addEventListener('click', () => {
+          handleDelete(category, index);
         });
 
-        materialsList.appendChild(materialCard);
+        container.appendChild(card);
       });
     }
 
-    renderMaterials();
+    // Render all categories
+    function renderAllCategories() {
+      const notes = getNotes();
+      const links = getImportantLinks();
+      const materials = getStudyMaterials();
 
-    // Listen for changes from other tabs
+      renderCategoryGrid(notes, 'notesList', 'notes');
+      renderCategoryGrid(links, 'linksList', 'links');
+      renderCategoryGrid(materials, 'materialsList', 'materials');
+    }
+
+    renderAllCategories();
+
+    // Listen for storage changes
     window.addEventListener('storage', () => {
-      renderMaterials();
+      renderAllCategories();
     });
   </script>
 </body>
