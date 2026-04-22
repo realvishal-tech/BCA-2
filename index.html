@@ -1,61 +1,461 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Study Portal | Student Login</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="BCA Study Hub — All-in-one study platform for Babasaheb Bhim Rao Ambedkar Bihar University BCA students"/>
+  <title>BCA Study Hub | BBRABU</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
-<body class="login-page">
-  <div class="login-container">
-    <div class="login-card">
-      <h1>📚 Study Portal</h1>
-      <p>LND College | BCA 2nd Semester</p>
+<body>
 
-      <div id="alertContainer"></div>
+<!-- Loading Screen -->
+<div class="loading-page" id="loadingPage">
+  <div class="spinner"></div>
+  <div class="loading-text">Loading BCA Study Hub...</div>
+</div>
 
-      <form id="loginForm" class="login-form">
-        <div class="form-group">
-          <label for="username">Full Name</label>
-          <input 
-            type="text" 
-            id="username" 
-            name="username" 
-            placeholder="Enter your full name" 
-            autocomplete="off"
-            required
-          />
-        </div>
-        <button type="submit" class="btn btn-primary">Enter Dashboard</button>
-      </form>
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar" id="mainNav">
+  <a href="index.html" class="nav-brand">
+    <span class="nav-brand-icon">📚</span>
+    <span class="nav-brand-text">BCA Study Hub</span>
+  </a>
 
-      <div class="login-footer">
-        <p>Are you an admin? <a href="admin.html">Admin Login →</a></p>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">🏠 Home</a>
+    <a href="semester.html?sem=1" class="nav-link">📖 Semesters</a>
+    <a href="#features-section" class="nav-link">⚡ Features</a>
+    <a href="#footer" class="nav-link">📞 About</a>
+  </div>
+
+  <div class="nav-actions">
+    <div class="nav-search-wrap">
+      <span class="nav-search-icon">🔍</span>
+      <input type="text" class="nav-search" id="navSearch" placeholder="Search subjects..." autocomplete="off"/>
+    </div>
+    <button class="btn-icon-nav dark-toggle-btn" title="Toggle Theme">☀️</button>
+    <button class="btn-icon-nav voice-cmd-btn" title="Voice Command">🎤</button>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Search Results -->
+<div class="search-results-drop" id="searchResultsDrop"></div>
+
+<!-- Mobile Nav -->
+<nav class="mobile-nav" id="mobileNav">
+  <a href="index.html" class="nav-link">🏠 Home</a>
+  <a href="semester.html?sem=1" class="nav-link">📖 Semesters</a>
+  <a href="#features-section" class="nav-link">⚡ Features</a>
+  <a href="admin.html" class="nav-link" style="opacity:0.4;font-size:0.78rem;">🔐 Admin</a>
+  <hr class="divider"/>
+  <button class="nav-link w-full" style="background:none;border:none;text-align:left;" onclick="toggleDarkMode()">🌙 Toggle Theme</button>
+  <button class="nav-link w-full" style="background:none;border:none;text-align:left;" onclick="startVoiceCommand()">🎤 Voice Command</button>
+  <button class="nav-link w-full export-data-btn" style="background:none;border:none;text-align:left;">📤 Export Data</button>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="hero">
+  <!-- Particles -->
+  <div class="hero-particles" id="heroParticles"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge">
+      🎓 Babasaheb Bhim Rao Ambedkar Bihar University
+    </div>
+    <h1 class="hero-title">
+      BCA <span>Study Hub</span>
+    </h1>
+    <p class="hero-subtitle">All-in-one platform for BCA students — Notes, PYQs, Videos, Lab Programs & much more across all 6 semesters.</p>
+
+    <!-- Hero Search -->
+    <div class="hero-search-wrap">
+      <input type="text" class="hero-search" id="heroSearch" placeholder="Search subjects, topics, codes..." autocomplete="off"/>
+      <button class="hero-search-btn" id="heroSearchBtn">🔍</button>
+      <div class="search-results-drop" id="heroSearchDrop" style="top:calc(100% + 6px);left:0;transform:none;width:100%;"></div>
+    </div>
+
+    <!-- Quick Action Buttons -->
+    <div class="hero-quick-btns">
+      <a href="#semesters-section" class="hero-quick-btn">📚 <span>Notes</span></a>
+      <a href="#semesters-section" class="hero-quick-btn">📝 <span>PYQs</span></a>
+      <a href="#semesters-section" class="hero-quick-btn">🎥 <span>Videos</span></a>
+      <a href="#semesters-section" class="hero-quick-btn">⌨️ <span>Labs</span></a>
+      <button class="hero-quick-btn open-suggestion-modal" style="border:none;">💬 <span>Suggest</span></button>
+    </div>
+
+    <!-- Stats -->
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-num">6</div><div class="hero-stat-label">Semesters</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">33</div><div class="hero-stat-label">Subjects</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">4+</div><div class="hero-stat-label">Resources / Subject</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">100%</div><div class="hero-stat-label">Free</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== REVISION DUE ALERT ===== -->
+<div id="revisionAlert" style="display:none;padding:12px clamp(16px,5vw,80px);background:linear-gradient(90deg,rgba(249,115,22,0.1),rgba(239,68,68,0.1));border-bottom:1px solid rgba(249,115,22,0.3);">
+  <div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+    <span style="font-size:1.1rem;">🔁</span>
+    <div>
+      <strong style="font-size:0.9rem;color:#c2410c;">Revision Due Today!</strong>
+      <div id="revisionDueList" style="font-size:0.82rem;color:var(--text-2);"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SEMESTERS SECTION ===== -->
+<section class="section" id="semesters-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">📖 Academics</div>
+      <h2 class="section-title">Choose Your Semester</h2>
+      <p class="section-desc">Select a semester to access subject-wise notes, PYQs, videos, and programs.</p>
+    </div>
+
+    <!-- Progress Overview -->
+    <div id="progressOverview" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:28px;display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div style="font-size:0.9rem;font-weight:700;">📊 Overall Progress</div>
+        <div id="overallProgressNum" style="font-size:0.82rem;color:var(--text-3);"></div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="overallProgressFill" style="width:0%"></div></div>
+    </div>
+
+    <div class="semesters-grid" id="semestersGrid"></div>
+  </div>
+</section>
+
+<!-- ===== QUICK ACTIONS ===== -->
+<section class="section section-dark">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">⚡ Quick Access</div>
+      <h2 class="section-title">Study Tools</h2>
+    </div>
+    <div class="quick-actions-grid">
+      <div class="qa-card" onclick="document.getElementById('challengeSection').scrollIntoView({behavior:'smooth'})">
+        <div class="qa-icon">🎮</div>
+        <div class="qa-title">Daily Challenge</div>
+        <div class="qa-desc">Test yourself with 5 random questions</div>
+      </div>
+      <div class="qa-card" onclick="showRandomQ()">
+        <div class="qa-icon">🎲</div>
+        <div class="qa-title">Random Question</div>
+        <div class="qa-desc">Practice a random PYQ instantly</div>
+      </div>
+      <div class="qa-card" onclick="showBookmarks()">
+        <div class="qa-icon">🔖</div>
+        <div class="qa-title">Bookmarks</div>
+        <div class="qa-desc">Access your saved subjects</div>
+      </div>
+      <div class="qa-card" onclick="exportUserData()">
+        <div class="qa-icon">📤</div>
+        <div class="qa-title">Export Data</div>
+        <div class="qa-desc">Download your progress & notes</div>
+      </div>
+      <div class="qa-card import-data-btn">
+        <div class="qa-icon">📥</div>
+        <div class="qa-title">Import Data</div>
+        <div class="qa-desc">Restore from a backup file</div>
+      </div>
+      <div class="qa-card open-suggestion-modal">
+        <div class="qa-icon">💬</div>
+        <div class="qa-title">Send Suggestion</div>
+        <div class="qa-desc">Share feedback with admin</div>
       </div>
     </div>
   </div>
+</section>
 
-  <script src="app.js"></script>
-  <script>
-    const loginForm = document.getElementById('loginForm');
-    const alertContainer = document.getElementById('alertContainer');
+<!-- ===== RANDOM QUESTION ===== -->
+<div id="randomQSection" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:4000;width:min(520px,92vw);">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px;box-shadow:var(--shadow-lg);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div style="font-size:1rem;font-weight:700;">🎲 Random Practice Question</div>
+      <button onclick="closeRandomQ()" style="background:none;border:none;font-size:1.2rem;color:var(--text-3);cursor:pointer;">✕</button>
+    </div>
+    <div id="randomQContent"></div>
+    <div style="margin-top:16px;display:flex;gap:10px;">
+      <button class="btn btn-primary" onclick="showRandomQ()">🔄 Next Question</button>
+      <button class="btn btn-secondary" onclick="closeRandomQ()">Close</button>
+    </div>
+  </div>
+</div>
+<div id="randomQOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3999;" onclick="closeRandomQ()"></div>
 
-    loginForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const username = document.getElementById('username').value.trim();
-      
-      if (!username) {
-        showAlert(alertContainer, '⚠️ Please enter your name', 'error');
-        return;
+<!-- ===== BOOKMARKS SECTION ===== -->
+<div id="bookmarkSection" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:4000;width:min(520px,92vw);max-height:80vh;overflow-y:auto;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px;box-shadow:var(--shadow-lg);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div style="font-size:1rem;font-weight:700;">🔖 Your Bookmarks</div>
+      <button onclick="closeBookmarks()" style="background:none;border:none;font-size:1.2rem;color:var(--text-3);cursor:pointer;">✕</button>
+    </div>
+    <div id="bookmarksList"></div>
+  </div>
+</div>
+<div id="bookmarkOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3999;" onclick="closeBookmarks()"></div>
+
+<!-- ===== FEATURES SECTION ===== -->
+<section class="section" id="features-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">✨ Advanced Features</div>
+      <h2 class="section-title">Everything You Need to Study</h2>
+      <p class="section-desc">Powerful tools built for serious BCA students.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;">
+      <div class="content-card"><div class="content-card-header"><div class="content-card-icon">🔁</div><div class="content-card-meta"><div class="content-card-title">Smart Revision Scheduler</div><div class="content-card-type">Spaced Repetition</div></div></div><div class="content-card-desc">Auto-schedules revision on Day 1, Day 3, and Day 7 when you complete a topic.</div></div>
+      <div class="content-card"><div class="content-card-header"><div class="content-card-icon">🔊</div><div class="content-card-meta"><div class="content-card-title">Text-to-Speech</div><div class="content-card-type">Audio Learning</div></div></div><div class="content-card-desc">Listen to notes read aloud using built-in browser speech synthesis. Play, pause, stop.</div></div>
+      <div class="content-card"><div class="content-card-header"><div class="content-card-icon">🎯</div><div class="content-card-meta"><div class="content-card-title">Exam Mode</div><div class="content-card-type">Distraction Free</div></div></div><div class="content-card-desc">Hide all UI distractions. Focus only on questions and notes during exams.</div></div>
+      <div class="content-card"><div class="content-card-header"><div class="content-card-icon">🎲</div><div class="content-card-meta"><div class="content-card-title">Random Question Generator</div><div class="content-card-type">Practice</div></div></div><div class="content-card-desc">Pick a random question from PYQ database to practice instantly.</div></div>
+      <div class="content-card"><div class="content-card-header"><div class="content-card-icon">📋</div><div class="content-card-meta"><div class="content-card-title">Copy Code Button</div><div class="content-card-type">Developer Tools</div></div></div><div class="content-card-desc">One-click copy for all code blocks and notes. Shows "Copied!" feedback.</div></div>
+      <div class="content-card"><div class="content-card-header"><div class="content-card-icon">🎤</div><div class="content-card-meta"><div class="content-card-title">Voice Commands</div><div class="content-card-type">Navigation</div></div></div><div class="content-card-desc">Navigate using voice: "Open Semester 1", "Search DBMS", "Dark Mode".</div></div>
+      <div class="content-card"><div class="content-card-header"><div class="content-card-icon">📤</div><div class="content-card-meta"><div class="content-card-title">Export / Import Data</div><div class="content-card-type">Backup & Restore</div></div></div><div class="content-card-desc">Export all your progress, bookmarks and notes to JSON. Restore anytime.</div></div>
+      <div class="content-card"><div class="content-card-header"><div class="content-card-icon">🖨️</div><div class="content-card-meta"><div class="content-card-title">Print Friendly Mode</div><div class="content-card-type">Offline Study</div></div></div><div class="content-card-desc">Clean print layout for notes. Hides UI elements automatically on print.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DAILY CHALLENGE SECTION ===== -->
+<section class="section section-dark" id="challengeSection">
+  <div class="container" style="max-width:700px;">
+    <div class="section-header">
+      <div class="section-label">🎮 Daily Challenge</div>
+      <h2 class="section-title">Test Your Knowledge</h2>
+      <p class="section-desc">5 random questions from all subjects. Earn badges!</p>
+    </div>
+    <div id="challengeWrap">
+      <div class="challenge-card" style="text-align:center;padding:32px;">
+        <div style="font-size:3rem;margin-bottom:12px;">🎯</div>
+        <div style="font-size:1rem;font-weight:600;margin-bottom:8px;">Ready for today's challenge?</div>
+        <div style="font-size:0.88rem;color:var(--text-2);margin-bottom:20px;">5 questions from all semesters</div>
+        <button class="btn btn-primary btn-lg" onclick="startChallenge(SAMPLE_QUESTIONS)">Start Challenge 🚀</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer style="background:var(--bg-2);border-top:1px solid var(--border);padding:40px clamp(16px,5vw,80px) 24px;" id="footer">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px;margin-bottom:32px;">
+      <div>
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:12px;">📚 BCA Study Hub</div>
+        <div style="font-size:0.83rem;color:var(--text-2);line-height:1.7;">All-in-one study platform for Babasaheb Bhim Rao Ambedkar Bihar University BCA students.</div>
+      </div>
+      <div>
+        <div style="font-size:0.85rem;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-3);">Semesters</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <a href="semester.html?sem=1" style="font-size:0.83rem;color:var(--text-2);">Semester 1</a>
+          <a href="semester.html?sem=2" style="font-size:0.83rem;color:var(--text-2);">Semester 2</a>
+          <a href="semester.html?sem=3" style="font-size:0.83rem;color:var(--text-2);">Semester 3</a>
+          <a href="semester.html?sem=4" style="font-size:0.83rem;color:var(--text-2);">Semester 4</a>
+          <a href="semester.html?sem=5" style="font-size:0.83rem;color:var(--text-2);">Semester 5</a>
+          <a href="semester.html?sem=6" style="font-size:0.83rem;color:var(--text-2);">Semester 6</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:0.85rem;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-3);">Resources</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <a href="#semesters-section" style="font-size:0.83rem;color:var(--text-2);">📝 Notes</a>
+          <a href="#semesters-section" style="font-size:0.83rem;color:var(--text-2);">📄 PYQs</a>
+          <a href="#semesters-section" style="font-size:0.83rem;color:var(--text-2);">🎥 Videos</a>
+          <a href="#semesters-section" style="font-size:0.83rem;color:var(--text-2);">⌨️ Programs</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:0.85rem;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-3);">Tools</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <button class="open-suggestion-modal" style="background:none;border:none;text-align:left;font-size:0.83rem;color:var(--text-2);cursor:pointer;padding:0;">💬 Send Suggestion</button>
+          <button class="export-data-btn" style="background:none;border:none;text-align:left;font-size:0.83rem;color:var(--text-2);cursor:pointer;padding:0;">📤 Export Data</button>
+          <button onclick="toggleDarkMode()" style="background:none;border:none;text-align:left;font-size:0.83rem;color:var(--text-2);cursor:pointer;padding:0;">🌙 Toggle Theme</button>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:center;">
+      <div style="font-size:0.78rem;color:var(--text-3);">© 2024 BCA Study Hub | BBRABU | Made with ❤️ for BCA Students</div>
+      <div style="font-size:0.78rem;color:var(--text-3);">Static · localStorage · No Backend Required</div>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== SUGGESTION MODAL ===== -->
+<div class="modal-overlay" id="suggestionOverlay">
+  <div class="modal" id="suggestionModal">
+    <div class="modal-header">
+      <div class="modal-title">💬 Send Suggestion</div>
+      <button class="modal-close close-suggestion-modal" aria-label="Close">✕</button>
+    </div>
+    <form id="suggestionForm">
+      <div class="form-field">
+        <label for="sugName">Your Name <span style="color:var(--text-3)">(optional)</span></label>
+        <input type="text" id="sugName" placeholder="Enter your name..." autocomplete="off"/>
+      </div>
+      <div class="form-field">
+        <label for="sugMessage">Message <span style="color:var(--danger)">*</span></label>
+        <textarea id="sugMessage" placeholder="Share your suggestion, feedback or report an issue..." required></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary close-suggestion-modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Send Suggestion ✉️</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===== VOICE COMMAND OVERLAY ===== -->
+<div class="voice-listening" id="voiceListeningOverlay">
+  <div class="voice-mic-icon">🎤</div>
+  <div class="voice-status">Listening for your command...</div>
+  <div style="font-size:0.78rem;color:var(--text-3);margin-top:8px;">Try: "Open Semester 1" or "Search DBMS"</div>
+</div>
+
+<!-- ===== FLOATING SUGGESTION BUTTON ===== -->
+<button class="fab-suggestion open-suggestion-modal" id="fabSuggestion" aria-label="Send Suggestion">
+  💬 <span class="fab-text">Send Suggestion</span>
+</button>
+
+<script src="script.js"></script>
+<script>
+// ===== HOMEPAGE JS =====
+
+// Render floating particles
+(function() {
+  const container = document.getElementById('heroParticles');
+  if (!container) return;
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;animation-delay:${Math.random()*8}s;animation-duration:${6+Math.random()*6}s;`;
+    container.appendChild(p);
+  }
+})();
+
+// Hide loading screen
+window.addEventListener('load', () => {
+  const lp = document.getElementById('loadingPage');
+  if (lp) { lp.style.opacity = '0'; lp.style.transition = 'opacity 0.4s'; setTimeout(() => lp.remove(), 450); }
+});
+
+// Render semester cards
+function renderSemesters() {
+  const grid = document.getElementById('semestersGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  let totalSubjects = 0, totalDone = 0;
+  Object.entries(SEMESTERS).forEach(([num, sem], idx) => {
+    const pct = getSemesterProgress(parseInt(num));
+    const done = sem.subjects.filter(s => isCompleted(s.code)).length;
+    totalSubjects += sem.subjects.length;
+    totalDone += done;
+    const card = document.createElement('div');
+    card.className = 'sem-card';
+    card.style.animationDelay = (idx * 0.08) + 's';
+    card.innerHTML = `
+      <div class="sem-card-header">
+        <div class="sem-card-icon">${sem.icon}</div>
+        <div>
+          <div class="sem-card-num">Semester ${num}</div>
+          <div class="sem-card-name">${sem.name}</div>
+        </div>
+      </div>
+      <div class="sem-card-subjects">
+        ${sem.subjects.slice(0,4).map(s => `<span class="sem-subject-chip">${s.code}</span>`).join('')}
+        ${sem.subjects.length > 4 ? `<span class="sem-subject-chip">+${sem.subjects.length-4} more</span>` : ''}
+      </div>
+      <div class="sem-card-footer">
+        <div>
+          <div class="sem-card-count">${sem.subjects.length} Subjects • ${done} completed</div>
+          <div class="sem-card-progress-bar"><div class="sem-card-progress-fill" style="width:${pct}%"></div></div>
+        </div>
+        <div class="sem-card-arrow">→</div>
+      </div>
+    `;
+    card.addEventListener('click', () => { window.location.href = `semester.html?sem=${num}`; });
+    grid.appendChild(card);
+  });
+
+  // Overall progress
+  if (totalDone > 0) {
+    const pov = document.getElementById('progressOverview');
+    const pf = document.getElementById('overallProgressFill');
+    const pn = document.getElementById('overallProgressNum');
+    if (pov && pf && pn) {
+      pov.style.display = 'block';
+      const pct = Math.round((totalDone/totalSubjects)*100);
+      pf.style.width = pct + '%';
+      pn.textContent = `${totalDone} / ${totalSubjects} subjects completed (${pct}%)`;
+    }
+  }
+}
+
+// Revision due check
+function checkRevisionDue() {
+  const due = getDueRevisions();
+  if (due.length === 0) return;
+  const alert = document.getElementById('revisionAlert');
+  const list = document.getElementById('revisionDueList');
+  if (alert && list) {
+    alert.style.display = 'block';
+    list.textContent = due.map(r => r.name).join(', ') + ' — revision due!';
+  }
+}
+
+// Random Question
+function showRandomQ() {
+  const q = getRandomQuestion();
+  const sec = document.getElementById('randomQSection');
+  const overlay = document.getElementById('randomQOverlay');
+  const content = document.getElementById('randomQContent');
+  if (!sec || !content) return;
+  content.innerHTML = `
+    <div style="background:var(--surface-2);border-radius:var(--radius);padding:16px;margin-bottom:12px;font-size:0.92rem;font-weight:500;line-height:1.7;">${q.q}</div>
+    <div style="font-size:0.8rem;color:var(--text-3);">📚 ${q.subject} &nbsp;|&nbsp; Semester ${q.sem}</div>
+  `;
+  sec.style.display = 'block';
+  overlay.style.display = 'block';
+}
+function closeRandomQ() {
+  document.getElementById('randomQSection').style.display = 'none';
+  document.getElementById('randomQOverlay').style.display = 'none';
+}
+
+// Bookmarks
+function showBookmarks() {
+  const sec = document.getElementById('bookmarkSection');
+  const overlay = document.getElementById('bookmarkOverlay');
+  const list = document.getElementById('bookmarksList');
+  const bm = getBookmarks();
+  if (!sec || !list) return;
+  if (bm.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔖</div><div class="empty-state-title">No Bookmarks Yet</div><div class="empty-state-desc">Bookmark subjects while studying to access them here.</div></div>';
+  } else {
+    list.innerHTML = bm.map(code => {
+      for (const [sNum, sem] of Object.entries(SEMESTERS)) {
+        const sub = sem.subjects.find(s => s.code === code);
+        if (sub) return `<div style="padding:10px 14px;background:var(--surface-2);border-radius:var(--radius-sm);margin-bottom:8px;display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="window.location.href='subject.html?sem=${sNum}&sub=${code}'"><span>${sub.icon}</span><div><div style="font-size:0.88rem;font-weight:600;">${sub.code} — ${sub.name}</div><div style="font-size:0.75rem;color:var(--text-3);">${sem.name}</div></div></div>`;
       }
-      
-      localStorage.setItem(STORAGE_USER_KEY, username);
-      showAlert(alertContainer, '✓ Welcome! Redirecting...', 'success');
-      
-      setTimeout(() => {
-        location.href = 'dashboard.html';
-      }, 800);
-    });
-  </script>
+      return '';
+    }).join('');
+  }
+  sec.style.display = 'block';
+  overlay.style.display = 'block';
+}
+function closeBookmarks() {
+  document.getElementById('bookmarkSection').style.display = 'none';
+  document.getElementById('bookmarkOverlay').style.display = 'none';
+}
+
+// Init
+renderSemesters();
+checkRevisionDue();
+restoreScrollPos('index');
+window.addEventListener('scroll', () => saveScrollPos('index'));
+</script>
 </body>
 </html>

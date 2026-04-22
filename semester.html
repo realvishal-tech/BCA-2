@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BCA Study Hub | Semester</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+  <a href="index.html" class="nav-brand">
+    <span class="nav-brand-icon">📚</span>
+    <span class="nav-brand-text">BCA Study Hub</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">🏠 Home</a>
+    <a href="#" id="navSemLink" class="nav-link active">📖 Semesters</a>
+  </div>
+  <div class="nav-actions">
+    <div class="nav-search-wrap">
+      <span class="nav-search-icon">🔍</span>
+      <input type="text" class="nav-search" id="navSearch" placeholder="Search subjects..." autocomplete="off"/>
+    </div>
+    <button class="btn-icon-nav dark-toggle-btn" title="Toggle Theme">☀️</button>
+    <button class="btn-icon-nav voice-cmd-btn" title="Voice Command">��</button>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="search-results-drop" id="searchResultsDrop"></div>
+<nav class="mobile-nav" id="mobileNav">
+  <a href="index.html" class="nav-link">🏠 Home</a>
+  <a href="#" class="nav-link">📖 Semesters</a>
+  <hr class="divider"/>
+  <button class="nav-link w-full" style="background:none;border:none;text-align:left;" onclick="toggleDarkMode()">🌙 Toggle Theme</button>
+  <button class="nav-link w-full" style="background:none;border:none;text-align:left;" onclick="startVoiceCommand()">🎤 Voice Command</button>
+</nav>
+
+<!-- ===== PAGE BANNER ===== -->
+<div class="page-banner" id="pageBanner">
+  <div class="breadcrumb">
+    <a href="index.html">Home</a> <span>›</span>
+    <span id="bannerSemName">Semester</span>
+  </div>
+  <h1 class="page-banner-title" id="bannerTitle">Loading...</h1>
+  <p class="page-banner-sub" id="bannerSub">Select a subject to study</p>
+</div>
+
+<!-- Semester Tabs Nav -->
+<div style="background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;padding:0 clamp(16px,5vw,80px);">
+  <div style="display:flex;gap:2px;max-width:1200px;margin:0 auto;" id="semTabsRow">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<!-- Progress Bar for semester -->
+<div style="padding:16px clamp(16px,5vw,80px) 0;">
+  <div style="max-width:1200px;margin:0 auto;" id="semProgressWrap" style="display:none;">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
+      <span style="font-size:0.82rem;font-weight:600;color:var(--text-2);">📊 Semester Progress</span>
+      <span id="semProgressNum" style="font-size:0.78rem;color:var(--text-3);"></span>
+    </div>
+    <div class="progress-bar" style="max-width:400px;"><div class="progress-fill" id="semProgressFill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<!-- ===== SUBJECTS GRID ===== -->
+<div class="subjects-grid" id="subjectsGrid" style="max-width:1260px;margin:0 auto;"></div>
+
+<!-- ===== HEATMAP SECTION ===== -->
+<div style="padding:24px clamp(16px,5vw,80px) 40px;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div style="font-size:0.9rem;font-weight:700;margin-bottom:12px;">📊 Subject Activity Heatmap</div>
+    <div style="font-size:0.78rem;color:var(--text-3);margin-bottom:8px;">Color indicates visit frequency: 
+      <span style="display:inline-flex;align-items:center;gap:4px;margin-left:6px;">
+        <span style="width:14px;height:14px;background:var(--border);border-radius:3px;display:inline-block;"></span> None
+        <span style="width:14px;height:14px;background:rgba(34,197,94,0.2);border-radius:3px;display:inline-block;margin-left:6px;"></span> Low
+        <span style="width:14px;height:14px;background:rgba(34,197,94,0.65);border-radius:3px;display:inline-block;margin-left:6px;"></span> High
+      </span>
+    </div>
+    <div class="heatmap-grid" id="semHeatmap"></div>
+  </div>
+</div>
+
+<!-- Suggestion FAB -->
+<button class="fab-suggestion open-suggestion-modal" aria-label="Send Suggestion">💬 <span class="fab-text">Suggest</span></button>
+
+<!-- Suggestion Modal -->
+<div class="modal-overlay" id="suggestionOverlay">
+  <div class="modal" id="suggestionModal">
+    <div class="modal-header">
+      <div class="modal-title">💬 Send Suggestion</div>
+      <button class="modal-close close-suggestion-modal">✕</button>
+    </div>
+    <form id="suggestionForm">
+      <div class="form-field"><label>Name (optional)</label><input type="text" id="sugName" placeholder="Your name..." autocomplete="off"/></div>
+      <div class="form-field"><label>Message *</label><textarea id="sugMessage" placeholder="Your suggestion..." required></textarea></div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary close-suggestion-modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Send ✉️</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Voice Command Overlay -->
+<div class="voice-listening" id="voiceListeningOverlay">
+  <div class="voice-mic-icon">🎤</div>
+  <div class="voice-status">Listening...</div>
+  <div style="font-size:0.78rem;color:var(--text-3);margin-top:8px;">Say: "Open Semester 1" or "Search DBMS"</div>
+</div>
+
+<script src="script.js"></script>
+<script>
+const semNum = parseInt(getParam('sem') || '1');
+const semData = SEMESTERS[semNum];
+
+if (!semData) { window.location.href = 'index.html'; }
+
+// Set page title & breadcrumb
+document.title = `BCA Study Hub | ${semData.name}`;
+document.getElementById('bannerTitle').textContent = `${semData.icon} ${semData.name}`;
+document.getElementById('bannerSub').textContent = `${semData.subjects.length} Subjects — Notes, PYQs, Videos & Programs`;
+document.getElementById('bannerSemName').textContent = semData.name;
+document.getElementById('navSemLink').textContent = `📖 ${semData.name}`;
+document.getElementById('navSemLink').href = `semester.html?sem=${semNum}`;
+
+// Semester tabs
+const tabsRow = document.getElementById('semTabsRow');
+Object.entries(SEMESTERS).forEach(([sn, sd]) => {
+  const btn = document.createElement('a');
+  btn.href = `semester.html?sem=${sn}`;
+  btn.className = 'tab-btn' + (parseInt(sn) === semNum ? ' active' : '');
+  btn.innerHTML = `${sd.icon} Sem ${sn}`;
+  tabsRow.appendChild(btn);
+});
+
+// Semester progress
+function renderSemProgress() {
+  const subjects = semData.subjects;
+  const done = subjects.filter(s => isCompleted(s.code)).length;
+  const pct = Math.round((done/subjects.length)*100);
+  const wrap = document.getElementById('semProgressWrap');
+  const fill = document.getElementById('semProgressFill');
+  const num = document.getElementById('semProgressNum');
+  if (wrap && fill && num) {
+    wrap.style.display = 'block';
+    fill.style.width = pct + '%';
+    num.textContent = `${done}/${subjects.length} completed (${pct}%)`;
+  }
+}
+
+// Render subjects
+function renderSubjects() {
+  const grid = document.getElementById('subjectsGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  semData.subjects.forEach((sub, idx) => {
+    const completed = isCompleted(sub.code);
+    const bookmarked = isBookmarked(sub.code);
+    const card = document.createElement('div');
+    card.className = 'subject-card' + (completed ? ' completed' : '');
+    card.style.animationDelay = (idx * 0.07) + 's';
+    card.innerHTML = `
+      <div class="subject-card-icon">${sub.icon}${completed ? '&nbsp;✅' : ''}</div>
+      <div class="subject-card-info">
+        <div class="subject-card-code">${sub.code}</div>
+        <div class="subject-card-name">${sub.name}</div>
+        <div class="subject-card-tags">
+          <span class="tag ${sub.type === 'lab' ? 'tag-lab' : 'tag-theory'}">${sub.type === 'lab' ? '🧪 Lab' : '📖 Theory'}</span>
+          ${sub.hasPrograms ? '<span class="tag">💻 Programs</span>' : ''}
+          ${bookmarked ? '<span class="tag" style="background:rgba(79,70,229,0.1);border-color:rgba(79,70,229,0.3);color:var(--primary);">🔖 Saved</span>' : ''}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+        <span class="subject-card-arrow">→</span>
+      </div>
+    `;
+    card.addEventListener('click', () => { window.location.href = `subject.html?sem=${semNum}&sub=${sub.code}`; });
+    grid.appendChild(card);
+  });
+}
+
+// Render heatmap
+function renderHeatmap() {
+  const hm = document.getElementById('semHeatmap');
+  if (!hm) return;
+  hm.innerHTML = '';
+  semData.subjects.forEach(sub => {
+    const lvl = getHeatLevel(sub.code);
+    const cell = document.createElement('div');
+    cell.className = `heatmap-cell heatmap-${lvl}`;
+    cell.textContent = sub.code.split('-')[1] || sub.code;
+    cell.title = `${sub.name}: ${getHeatmap()[sub.code]?.visits || 0} visits`;
+    hm.appendChild(cell);
+  });
+}
+
+renderSubjects();
+renderSemProgress();
+renderHeatmap();
+restoreScrollPos('sem-' + semNum);
+window.addEventListener('scroll', () => saveScrollPos('sem-' + semNum));
+</script>
+</body>
+</html>

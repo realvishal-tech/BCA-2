@@ -1,416 +1,465 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Study Portal | Admin Dashboard</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BCA Study Hub | Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <div class="dashboard">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-brand">
-        <h2>⚙️ Admin Hub</h2>
-      </div>
 
-      <nav class="sidebar-nav">
-        <a href="admin-dashboard.html" class="nav-item active">
-          <span class="nav-icon">📊</span>
-          <span>Dashboard</span>
-        </a>
-        <a href="#notes" class="nav-item">
-          <span class="nav-icon">📝</span>
-          <span>Notes</span>
-        </a>
-        <a href="#links" class="nav-item">
-          <span class="nav-icon">🔗</span>
-          <span>Links</span>
-        </a>
-        <a href="#materials" class="nav-item">
-          <span class="nav-icon">📖</span>
-          <span>Materials</span>
-        </a>
-      </nav>
+<!-- Admin Layout -->
+<div class="admin-layout">
 
-      <div class="sidebar-footer">
-        <button class="btn btn-secondary" id="logoutBtn" style="width: 100%; margin-bottom: 0;">
-          Logout
-        </button>
-      </div>
-    </aside>
-
-    <!-- Top Navbar -->
-    <nav class="topbar">
-      <div class="topbar-left">
-        <button class="menu-toggle" id="menuToggle">☰</button>
-        <span class="topbar-title">Admin Panel</span>
-      </div>
-
-      <div class="topbar-right">
-        <div class="user-info">
-          <div class="user-avatar">👤</div>
-          <div class="user-details">
-            <div class="user-name">Administrator</div>
-            <div class="user-role">Admin</div>
-          </div>
-        </div>
-      </div>
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="admin-sidebar-header">
+      <span class="admin-sidebar-logo">⚙️</span>
+      <div class="admin-sidebar-title"><span>Admin Hub</span></div>
+    </div>
+    <nav class="admin-sidebar-nav">
+      <button class="admin-nav-item active" data-section="dashboard">📊 Dashboard</button>
+      <button class="admin-nav-item" data-section="content">📚 Manage Content</button>
+      <button class="admin-nav-item" data-section="inbox" id="inboxNavBtn">
+        📥 Inbox <span class="admin-nav-badge" id="inboxBadge" style="display:none;">0</span>
+      </button>
     </nav>
+    <div class="admin-sidebar-footer">
+      <button class="btn btn-danger btn-sm btn-full" onclick="adminLogout()">🚪 Logout</button>
+      <div style="margin-top:8px;font-size:0.72rem;color:var(--text-3);text-align:center;">BCA Study Hub Admin</div>
+    </div>
+  </aside>
+  <div class="admin-sidebar-overlay" id="adminOverlay"></div>
 
-    <!-- Main Content -->
-    <main class="main-content">
-      <div id="alertContainer"></div>
-
-      <!-- Welcome Section -->
-      <div class="welcome-card">
-        <div class="welcome-title">Admin Control Panel 🎛️</div>
-        <div class="welcome-subtitle">
-          Manage study notes, important links, and materials. All changes will be reflected instantly on student dashboards.
-        </div>
+  <!-- Main -->
+  <main class="admin-main">
+    <!-- Topbar -->
+    <div class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="admin-menu-toggle" id="adminMenuToggle">☰</button>
+        <div class="admin-topbar-title" id="adminTopbarTitle">Dashboard</div>
       </div>
+      <div class="admin-topbar-actions">
+        <button class="btn-icon-nav dark-toggle-btn" title="Toggle Theme">☀️</button>
+        <a href="index.html" class="btn btn-secondary btn-sm" target="_blank">🌐 View Site</a>
+      </div>
+    </div>
 
-      <!-- ==================== NOTES SECTION ==================== -->
-      <div class="category-section" id="notesSection">
-        <div class="category-header">
-          <div class="category-icon">📝</div>
-          <div class="category-title">Study Notes</div>
+    <div class="admin-content">
+
+      <!-- ===== DASHBOARD SECTION ===== -->
+      <div class="admin-section active" id="sec-dashboard">
+        <div style="margin-bottom:20px;">
+          <div style="font-size:1.1rem;font-weight:700;margin-bottom:4px;">Welcome, Administrator 👋</div>
+          <div style="font-size:0.85rem;color:var(--text-2);">Manage study content, view suggestions, and track stats.</div>
         </div>
 
-        <!-- Add Notes Form -->
-        <div class="card grid-full" style="margin-bottom: 24px;">
-          <div class="card-header">
-            <div class="card-title">➕ Add New Note</div>
+        <div class="admin-stats-grid" id="adminStatsGrid">
+          <div class="admin-stat-card"><div class="admin-stat-icon">📚</div><div class="admin-stat-value" id="statSems">6</div><div class="admin-stat-label">Semesters</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-icon">📖</div><div class="admin-stat-value" id="statSubjects">33</div><div class="admin-stat-label">Subjects</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-icon">📝</div><div class="admin-stat-value" id="statNotes">0</div><div class="admin-stat-label">Notes Added</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-icon">🎥</div><div class="admin-stat-value" id="statVideos">0</div><div class="admin-stat-label">Videos</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-icon">💻</div><div class="admin-stat-value" id="statPrograms">0</div><div class="admin-stat-label">Programs</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-icon">📥</div><div class="admin-stat-value" id="statInbox">0</div><div class="admin-stat-label">Suggestions</div></div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;">
+          <div style="font-size:0.9rem;font-weight:700;margin-bottom:14px;">📋 Quick Actions</div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;">
+            <button class="btn btn-primary btn-sm" onclick="switchSection('content')">➕ Add Content</button>
+            <button class="btn btn-secondary btn-sm" onclick="switchSection('inbox')">📥 View Inbox</button>
+            <button class="btn btn-secondary btn-sm" onclick="exportUserData()">📤 Export All Data</button>
+            <a href="index.html" target="_blank" class="btn btn-accent btn-sm">🌐 View Live Site</a>
           </div>
-
-          <form id="notesForm" class="add-material-form">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="notesTitle">Note Title</label>
-                <input 
-                  type="text" 
-                  id="notesTitle" 
-                  placeholder="e.g., Class 5 - JavaScript Basics" 
-                  autocomplete="off"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="notesUrl">Note URL</label>
-                <input 
-                  type="url" 
-                  id="notesUrl" 
-                  placeholder="https://example.com" 
-                  autocomplete="off"
-                  required
-                />
-              </div>
-            </div>
-            <div class="action-buttons">
-              <button type="submit" class="btn btn-primary" style="width: auto; flex: 1; max-width: 150px;">
-                Add Note
-              </button>
-              <button type="reset" class="btn btn-secondary" style="width: auto; flex: 1; max-width: 150px;">
-                Clear
-              </button>
-            </div>
-          </form>
         </div>
-
-        <!-- Notes List -->
-        <div class="category-grid" id="notesList"></div>
       </div>
 
-      <!-- ==================== IMPORTANT LINKS SECTION ==================== -->
-      <div class="category-section" id="linksSection">
-        <div class="category-header">
-          <div class="category-icon">🔗</div>
-          <div class="category-title">Important Links</div>
+      <!-- ===== CONTENT MANAGEMENT SECTION ===== -->
+      <div class="admin-section" id="sec-content">
+        <div style="margin-bottom:20px;">
+          <div style="font-size:1.1rem;font-weight:700;margin-bottom:4px;">📚 Manage Content</div>
+          <div style="font-size:0.85rem;color:var(--text-2);">Add or remove notes, PYQs, videos, and programs for each subject.</div>
         </div>
 
-        <!-- Add Links Form -->
-        <div class="card grid-full" style="margin-bottom: 24px;">
-          <div class="card-header">
-            <div class="card-title">➕ Add New Link</div>
+        <!-- Semester Select -->
+        <div style="font-size:0.82rem;font-weight:600;color:var(--text-3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Select Semester</div>
+        <div class="sem-select-tabs" id="semSelectTabs"></div>
+
+        <!-- Subject Select -->
+        <div style="font-size:0.82rem;font-weight:600;color:var(--text-3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Select Subject</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;" id="subSelectTabs"></div>
+
+        <!-- Content Type Select -->
+        <div style="font-size:0.82rem;font-weight:600;color:var(--text-3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Content Type</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;" id="contentTypeTabs">
+          <button class="sem-tab-btn active" data-type="notes">📝 Notes</button>
+          <button class="sem-tab-btn" data-type="pyqs">📄 PYQs</button>
+          <button class="sem-tab-btn" data-type="videos">🎥 Videos</button>
+          <button class="sem-tab-btn" data-type="programs">💻 Programs</button>
+          <button class="sem-tab-btn" data-type="lab">🧪 Lab</button>
+        </div>
+
+        <!-- Add Form -->
+        <div class="admin-form-card">
+          <div class="admin-form-title" id="contentFormTitle">➕ Add Note</div>
+          <div class="admin-form-grid" id="contentForm">
+            <!-- rendered by JS -->
           </div>
-
-          <form id="linksForm" class="add-material-form">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="linksTitle">Link Title</label>
-                <input 
-                  type="text" 
-                  id="linksTitle" 
-                  placeholder="e.g., Official Course Website" 
-                  autocomplete="off"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="linksUrl">Link URL</label>
-                <input 
-                  type="url" 
-                  id="linksUrl" 
-                  placeholder="https://example.com" 
-                  autocomplete="off"
-                  required
-                />
-              </div>
-            </div>
-            <div class="action-buttons">
-              <button type="submit" class="btn btn-primary" style="width: auto; flex: 1; max-width: 150px;">
-                Add Link
-              </button>
-              <button type="reset" class="btn btn-secondary" style="width: auto; flex: 1; max-width: 150px;">
-                Clear
-              </button>
-            </div>
-          </form>
         </div>
 
-        <!-- Links List -->
-        <div class="category-grid" id="linksList"></div>
+        <!-- Items List -->
+        <div style="font-size:0.9rem;font-weight:700;margin-bottom:12px;" id="contentListTitle">Existing Notes</div>
+        <div class="admin-items-grid" id="adminItemsList"></div>
       </div>
 
-      <!-- ==================== STUDY MATERIALS SECTION ==================== -->
-      <div class="category-section" id="materialsSection">
-        <div class="category-header">
-          <div class="category-icon">📖</div>
-          <div class="category-title">Study Materials</div>
-        </div>
-
-        <!-- Add Materials Form -->
-        <div class="card grid-full" style="margin-bottom: 24px;">
-          <div class="card-header">
-            <div class="card-title">➕ Add New Material</div>
+      <!-- ===== INBOX SECTION ===== -->
+      <div class="admin-section" id="sec-inbox">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+          <div>
+            <div style="font-size:1.1rem;font-weight:700;margin-bottom:4px;">📥 User Suggestions</div>
+            <div style="font-size:0.85rem;color:var(--text-2);">Messages from students. Mark as read or delete.</div>
           </div>
-
-          <form id="materialsForm" class="add-material-form">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="materialsTitle">Material Title</label>
-                <input 
-                  type="text" 
-                  id="materialsTitle" 
-                  placeholder="e.g., Complete JavaScript Tutorial" 
-                  autocomplete="off"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="materialsUrl">Material URL</label>
-                <input 
-                  type="url" 
-                  id="materialsUrl" 
-                  placeholder="https://example.com" 
-                  autocomplete="off"
-                  required
-                />
-              </div>
-            </div>
-            <div class="action-buttons">
-              <button type="submit" class="btn btn-primary" style="width: auto; flex: 1; max-width: 150px;">
-                Add Material
-              </button>
-              <button type="reset" class="btn btn-secondary" style="width: auto; flex: 1; max-width: 150px;">
-                Clear
-              </button>
-            </div>
-          </form>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-secondary btn-sm" id="markAllReadBtn">✅ Mark All Read</button>
+            <button class="btn btn-danger btn-sm" id="clearAllInboxBtn">🗑️ Clear All</button>
+          </div>
         </div>
-
-        <!-- Materials List -->
-        <div class="category-grid" id="materialsList"></div>
+        <div id="inboxList"></div>
       </div>
-    </main>
-  </div>
 
-  <!-- Mobile Sidebar Toggle Float Button -->
-  <button class="toggle-sidebar" id="toggleSidebarBtn">☰</button>
+    </div><!-- end admin-content -->
+  </main>
+</div>
 
-  <script src="app.js"></script>
-  <script>
-    const sidebar = document.querySelector('.sidebar');
-    const menuToggle = document.getElementById('menuToggle');
-    const toggleBtn = document.getElementById('toggleSidebarBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const alertContainer = document.getElementById('alertContainer');
+<script src="script.js"></script>
+<script>
+// Check admin login
+if (!isAdminLoggedIn()) { window.location.replace('admin.html'); }
 
-    // Check admin login
-    if (!ensureAdminLoggedIn()) {
-      return;
-    }
+// ===== NAVIGATION =====
+let currentSem = 1;
+let currentSub = '';
+let currentType = 'notes';
 
-    // Menu toggle
-    menuToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('active');
+function switchSection(name) {
+  document.querySelectorAll('.admin-nav-item').forEach(b => {
+    b.classList.toggle('active', b.dataset.section === name);
+  });
+  document.querySelectorAll('.admin-section').forEach(s => {
+    s.classList.toggle('active', s.id === 'sec-' + name);
+  });
+  const titles = { dashboard: 'Dashboard', content: 'Manage Content', inbox: 'Inbox' };
+  document.getElementById('adminTopbarTitle').textContent = titles[name] || name;
+
+  if (name === 'inbox') renderInbox();
+  if (name === 'dashboard') updateStats();
+}
+
+document.querySelectorAll('.admin-nav-item').forEach(btn => {
+  btn.addEventListener('click', () => switchSection(btn.dataset.section));
+});
+
+// Hamburger
+const adminSidebar = document.getElementById('adminSidebar');
+const adminOverlay = document.getElementById('adminOverlay');
+document.getElementById('adminMenuToggle').addEventListener('click', () => {
+  adminSidebar.classList.toggle('open');
+  adminOverlay.classList.toggle('show');
+});
+adminOverlay.addEventListener('click', () => {
+  adminSidebar.classList.remove('open');
+  adminOverlay.classList.remove('show');
+});
+
+// ===== STATS =====
+function updateStats() {
+  let totalNotes = 0, totalVideos = 0, totalPrograms = 0;
+  const content = getAllContent();
+  const allCodes = Object.values(SEMESTERS).flatMap(s => s.subjects.map(sub => sub.code));
+  allCodes.forEach(code => {
+    const c = content[code] || DEFAULT_CONTENT[code] || {};
+    totalNotes += (c.notes || []).length;
+    totalVideos += (c.videos || []).length;
+    totalPrograms += (c.programs || []).length + (c.lab || []).length;
+  });
+  document.getElementById('statNotes').textContent = totalNotes;
+  document.getElementById('statVideos').textContent = totalVideos;
+  document.getElementById('statPrograms').textContent = totalPrograms;
+  document.getElementById('statInbox').textContent = getSuggestions().length;
+  updateInboxBadge();
+}
+
+function updateInboxBadge() {
+  const count = unreadCount();
+  const badge = document.getElementById('inboxBadge');
+  if (count > 0) { badge.textContent = count; badge.style.display = ''; }
+  else { badge.style.display = 'none'; }
+}
+
+// ===== CONTENT SECTION =====
+function initSemTabs() {
+  const container = document.getElementById('semSelectTabs');
+  container.innerHTML = '';
+  Object.entries(SEMESTERS).forEach(([sn, sd]) => {
+    const btn = document.createElement('button');
+    btn.className = 'sem-tab-btn' + (parseInt(sn) === currentSem ? ' active' : '');
+    btn.innerHTML = `${sd.icon} Sem ${sn}`;
+    btn.addEventListener('click', () => {
+      currentSem = parseInt(sn);
+      currentSub = '';
+      initSemTabs();
+      initSubjectTabs();
+      renderContentForm();
+      renderContentList();
     });
+    container.appendChild(btn);
+  });
+}
 
-    toggleBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('active');
+function initSubjectTabs() {
+  const container = document.getElementById('subSelectTabs');
+  container.innerHTML = '';
+  const subjects = SEMESTERS[currentSem]?.subjects || [];
+  if (!currentSub && subjects.length) currentSub = subjects[0].code;
+  subjects.forEach(sub => {
+    const btn = document.createElement('button');
+    btn.className = 'sem-tab-btn' + (sub.code === currentSub ? ' active' : '');
+    btn.innerHTML = `${sub.icon} ${sub.code}`;
+    btn.title = sub.name;
+    btn.addEventListener('click', () => {
+      currentSub = sub.code;
+      initSubjectTabs();
+      renderContentForm();
+      renderContentList();
     });
+    container.appendChild(btn);
+  });
+}
 
-    // Close sidebar when clicking on a nav item
-    document.querySelectorAll('.nav-item').forEach(item => {
-      item.addEventListener('click', () => {
-        sidebar.classList.remove('active');
+document.querySelectorAll('#contentTypeTabs .sem-tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentType = btn.dataset.type;
+    document.querySelectorAll('#contentTypeTabs .sem-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.type === currentType));
+    renderContentForm();
+    renderContentList();
+  });
+});
+
+function getFormConfig(type) {
+  const configs = {
+    notes: [
+      { id: 'fTitle', label: 'Title *', type: 'text', placeholder: 'Note title...' },
+      { id: 'fDesc', label: 'Description / Summary', type: 'textarea', placeholder: 'Short description...' },
+      { id: 'fUrl', label: 'URL (optional)', type: 'url', placeholder: 'https://...' },
+    ],
+    pyqs: [
+      { id: 'fTitle', label: 'Title *', type: 'text', placeholder: 'e.g., BCA-101 PYQ 2023' },
+      { id: 'fYear', label: 'Year', type: 'text', placeholder: '2023' },
+      { id: 'fDesc', label: 'Description', type: 'text', placeholder: 'Brief description...' },
+      { id: 'fQuestions', label: 'Questions (one per line)', type: 'textarea', placeholder: 'Q1 text\nQ2 text\n...' },
+      { id: 'fUrl', label: 'PDF URL (optional)', type: 'url', placeholder: 'https://...' },
+    ],
+    videos: [
+      { id: 'fTitle', label: 'Title *', type: 'text', placeholder: 'Video title...' },
+      { id: 'fYtId', label: 'YouTube Video ID or URL *', type: 'text', placeholder: 'dQw4w9WgXcQ or full YouTube URL' },
+      { id: 'fDesc', label: 'Description', type: 'text', placeholder: 'Brief description...' },
+    ],
+    programs: [
+      { id: 'fTitle', label: 'Program Title *', type: 'text', placeholder: 'e.g., Hello World in C' },
+      { id: 'fDesc', label: 'Description', type: 'text', placeholder: 'What the program does...' },
+      { id: 'fCode', label: 'Source Code *', type: 'textarea', placeholder: '#include <stdio.h>\n...' },
+    ],
+    lab: [
+      { id: 'fTitle', label: 'Lab Exercise Title *', type: 'text', placeholder: 'e.g., Lab 1: ...' },
+      { id: 'fDesc', label: 'Description', type: 'text', placeholder: 'Lab objective...' },
+      { id: 'fCode', label: 'Code / Commands', type: 'textarea', placeholder: 'Lab code or commands...' },
+    ],
+  };
+  return configs[type] || configs.notes;
+}
+
+function renderContentForm() {
+  const form = document.getElementById('contentForm');
+  const title = document.getElementById('contentFormTitle');
+  const sub = SEMESTERS[currentSem]?.subjects.find(s => s.code === currentSub);
+  const typeNames = { notes: 'Note', pyqs: 'PYQ', videos: 'Video', programs: 'Program', lab: 'Lab Exercise' };
+  title.textContent = `➕ Add ${typeNames[currentType] || ''} for ${currentSub || '...'}`;
+
+  const fields = getFormConfig(currentType);
+  form.innerHTML = `
+    <div style="font-size:0.82rem;color:var(--text-3);margin-bottom:4px;">Subject: ${sub ? sub.icon + ' ' + sub.name : ''}</div>
+    ${fields.map(f => `
+      <div class="form-field">
+        <label>${f.label}</label>
+        ${f.type === 'textarea'
+          ? `<textarea id="${f.id}" placeholder="${f.placeholder}" style="font-family:${f.id==='fCode'?'\'Courier New\',monospace':'inherit'};min-height:${f.id==='fCode'?'140px':'80px'};font-size:0.83rem;"></textarea>`
+          : `<input type="${f.type}" id="${f.id}" placeholder="${f.placeholder}"/>`
+        }
+      </div>
+    `).join('')}
+    <div style="display:flex;gap:10px;margin-top:4px;">
+      <button class="btn btn-primary" id="addContentBtn">➕ Add Item</button>
+      <button class="btn btn-secondary" id="clearFormBtn">Clear</button>
+    </div>
+  `;
+
+  document.getElementById('addContentBtn').addEventListener('click', addContentItemAdmin);
+  document.getElementById('clearFormBtn').addEventListener('click', () => renderContentForm());
+}
+
+function getFieldVal(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+function addContentItemAdmin() {
+  if (!currentSub) { showToast('Please select a subject', 'error'); return; }
+  const title = getFieldVal('fTitle');
+  if (!title) { showToast('Title is required', 'error'); return; }
+
+  let item = { title };
+  const desc = getFieldVal('fDesc');
+  const url = getFieldVal('fUrl');
+  const ytRaw = getFieldVal('fYtId');
+  const code = getFieldVal('fCode');
+  const year = getFieldVal('fYear');
+  const questions = getFieldVal('fQuestions');
+
+  if (desc) item.desc = desc;
+  if (url) item.url = url;
+  if (year) item.year = year;
+  if (questions) item.questions = questions;
+  if (code) item.code = code;
+  if (ytRaw) {
+    // Extract YouTube ID from URL or use raw ID
+    const m = ytRaw.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&\n?#]+)/);
+    item.youtubeId = m ? m[1] : ytRaw;
+  }
+
+  addContentItem(currentSub, currentType, item);
+  showToast(`✅ ${currentType.slice(0,-1)} added successfully!`, 'success');
+  renderContentForm();
+  renderContentList();
+  updateStats();
+}
+
+function renderContentList() {
+  const container = document.getElementById('adminItemsList');
+  const listTitle = document.getElementById('contentListTitle');
+  const typeNames = { notes: 'Notes', pyqs: 'PYQs', videos: 'Videos', programs: 'Programs', lab: 'Lab Exercises' };
+  listTitle.textContent = `${typeNames[currentType] || ''} for ${currentSub || '...'}`;
+
+  if (!currentSub) { container.innerHTML = '<div class="admin-empty"><div class="admin-empty-icon">👆</div>Select a subject above</div>'; return; }
+
+  const content = getSubjectContent(currentSub);
+  const items = content[currentType] || [];
+
+  if (items.length === 0) {
+    container.innerHTML = `<div class="admin-empty"><div class="admin-empty-icon">📭</div>No ${typeNames[currentType]} added yet</div>`;
+    return;
+  }
+
+  container.innerHTML = '';
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'admin-item-card';
+    card.innerHTML = `
+      <div class="admin-item-title">${item.title}</div>
+      ${item.desc ? `<div class="admin-item-meta">${item.desc}</div>` : ''}
+      ${item.year ? `<div class="admin-item-meta">Year: ${item.year}</div>` : ''}
+      ${item.youtubeId ? `<div class="admin-item-meta">YouTube: ${item.youtubeId}</div>` : ''}
+      ${item.url ? `<div class="admin-item-meta" style="word-break:break-all;font-size:0.7rem;">${item.url}</div>` : ''}
+      <div class="admin-item-actions">
+        ${item.url ? `<a href="${item.url}" target="_blank" class="btn btn-accent btn-sm">🔗 View</a>` : ''}
+        ${item.youtubeId ? `<a href="https://www.youtube.com/watch?v=${item.youtubeId}" target="_blank" class="btn btn-accent btn-sm">▶️ Watch</a>` : ''}
+        <button class="btn btn-danger btn-sm" data-id="${item.id}">🗑️ Delete</button>
+      </div>
+    `;
+    card.querySelector('.btn-danger').addEventListener('click', () => {
+      if (confirm('Delete this item?')) {
+        deleteContentItem(currentSub, currentType, item.id);
+        showToast('Item deleted', 'success');
+        renderContentList();
+        updateStats();
+      }
+    });
+    container.appendChild(card);
+  });
+}
+
+// ===== INBOX =====
+function renderInbox() {
+  const list = document.getElementById('inboxList');
+  const suggestions = getSuggestions();
+  updateInboxBadge();
+
+  if (suggestions.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📬</div><div class="empty-state-title">Inbox is empty</div><div class="empty-state-desc">No suggestions yet. Students can send suggestions from the site.</div></div>`;
+    return;
+  }
+
+  list.innerHTML = '';
+  suggestions.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'inbox-card' + (s.read ? '' : ' unread');
+    const initials = (s.name || 'A').charAt(0).toUpperCase();
+    card.innerHTML = `
+      <div class="inbox-header">
+        <div class="inbox-avatar">${initials}</div>
+        <div class="inbox-meta">
+          <div class="inbox-name">${escHtml(s.name || 'Anonymous')} ${s.read ? '' : '<span style="background:var(--primary);color:#fff;font-size:0.68rem;padding:1px 7px;border-radius:99px;margin-left:6px;vertical-align:middle;">NEW</span>'}</div>
+          <div class="inbox-date">📅 ${s.date}</div>
+        </div>
+      </div>
+      <div class="inbox-message">${escHtml(s.message)}</div>
+      <div class="inbox-actions">
+        <button class="btn btn-secondary btn-sm" data-id="${s.id}" data-action="read">${s.read ? '📭 Mark Unread' : '✅ Mark as Read'}</button>
+        <button class="btn btn-danger btn-sm" data-id="${s.id}" data-action="delete">🗑️ Delete</button>
+      </div>
+    `;
+    card.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.dataset.action === 'read') {
+          markSuggestionRead(btn.dataset.id);
+          renderInbox();
+        } else if (btn.dataset.action === 'delete') {
+          if (confirm('Delete this suggestion?')) {
+            deleteSuggestion(btn.dataset.id);
+            renderInbox();
+            updateStats();
+          }
+        }
       });
     });
+    list.appendChild(card);
+  });
+}
 
-    // Logout
-    logoutBtn.addEventListener('click', () => {
-      logoutAdmin();
-    });
+document.getElementById('markAllReadBtn').addEventListener('click', () => {
+  const arr = getSuggestions().map(s => ({ ...s, read: true }));
+  store.set(K.SUGGESTIONS, arr);
+  renderInbox();
+  updateInboxBadge();
+  showToast('All marked as read', 'success');
+});
 
-    // ==================== NOTES MANAGEMENT ====================
-    const notesForm = document.getElementById('notesForm');
+document.getElementById('clearAllInboxBtn').addEventListener('click', () => {
+  if (confirm('Delete ALL suggestions? This cannot be undone.')) {
+    store.set(K.SUGGESTIONS, []);
+    renderInbox();
+    updateStats();
+    showToast('Inbox cleared', 'info');
+  }
+});
 
-    notesForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const title = document.getElementById('notesTitle').value.trim();
-      const url = document.getElementById('notesUrl').value.trim();
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
-      if (!title || !url) {
-        showAlert(alertContainer, '⚠️ Please fill in all fields', 'error');
-        return;
-      }
-
-      if (!/^https?:\/\//i.test(url)) {
-        showAlert(alertContainer, '❌ URL must start with http:// or https://', 'error');
-        return;
-      }
-
-      addToCategory('notes', { title, url });
-      notesForm.reset();
-      document.getElementById('notesTitle').focus();
-      showAlert(alertContainer, '✓ Note added successfully', 'success');
-      renderAllCategories();
-    });
-
-    // ==================== LINKS MANAGEMENT ====================
-    const linksForm = document.getElementById('linksForm');
-
-    linksForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const title = document.getElementById('linksTitle').value.trim();
-      const url = document.getElementById('linksUrl').value.trim();
-
-      if (!title || !url) {
-        showAlert(alertContainer, '⚠️ Please fill in all fields', 'error');
-        return;
-      }
-
-      if (!/^https?:\/\//i.test(url)) {
-        showAlert(alertContainer, '❌ URL must start with http:// or https://', 'error');
-        return;
-      }
-
-      addToCategory('links', { title, url });
-      linksForm.reset();
-      document.getElementById('linksTitle').focus();
-      showAlert(alertContainer, '✓ Link added successfully', 'success');
-      renderAllCategories();
-    });
-
-    // ==================== MATERIALS MANAGEMENT ====================
-    const materialsForm = document.getElementById('materialsForm');
-
-    materialsForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const title = document.getElementById('materialsTitle').value.trim();
-      const url = document.getElementById('materialsUrl').value.trim();
-
-      if (!title || !url) {
-        showAlert(alertContainer, '⚠️ Please fill in all fields', 'error');
-        return;
-      }
-
-      if (!/^https?:\/\//i.test(url)) {
-        showAlert(alertContainer, '❌ URL must start with http:// or https://', 'error');
-        return;
-      }
-
-      addToCategory('materials', { title, url });
-      materialsForm.reset();
-      document.getElementById('materialsTitle').focus();
-      showAlert(alertContainer, '✓ Material added successfully', 'success');
-      renderAllCategories();
-    });
-
-    // Delete item from category
-    function handleDelete(category, index) {
-      if (confirm('Are you sure you want to delete this item?')) {
-        removeFromCategory(category, index);
-        showAlert(alertContainer, '✓ Item deleted successfully', 'success');
-        renderAllCategories();
-      }
-    }
-
-    // Render category
-    function renderCategoryGrid(items, containerId, category) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = '';
-
-      if (items.length === 0) {
-        const iconMap = { notes: '📝', links: '🔗', materials: '📖' };
-        container.innerHTML = `
-          <div class="category-empty">
-            <div class="category-empty-icon">${iconMap[category]}</div>
-            <p>No items in this category yet</p>
-            <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">Add your first item using the form above</p>
-          </div>
-        `;
-        return;
-      }
-
-      items.forEach((item, index) => {
-        const card = document.createElement('div');
-        card.className = 'preview-card';
-        card.innerHTML = `
-          <div class="preview-header">
-            <div class="preview-favicon">
-              <img src="https://www.google.com/s2/favicons?domain=${getDomainName(item.url)}&sz=32" alt="favicon" onerror="this.src='🔗'">
-            </div>
-            <div class="preview-meta">
-              <div class="preview-title">${item.title}</div>
-              <div class="preview-domain">${getDomainName(item.url)}</div>
-            </div>
-          </div>
-          <div class="preview-actions">
-            <button class="btn-preview-open" data-url="${item.url}" title="Open link">🔗</button>
-            <button class="btn-preview-delete" data-category="${category}" data-index="${index}" title="Delete item">🗑️</button>
-          </div>
-        `;
-
-        card.querySelector('.btn-preview-open').addEventListener('click', () => {
-          window.open(item.url, '_blank');
-        });
-
-        card.querySelector('.btn-preview-delete').addEventListener('click', () => {
-          handleDelete(category, index);
-        });
-
-        container.appendChild(card);
-      });
-    }
-
-    // Render all categories
-    function renderAllCategories() {
-      const notes = getNotes();
-      const links = getImportantLinks();
-      const materials = getStudyMaterials();
-
-      renderCategoryGrid(notes, 'notesList', 'notes');
-      renderCategoryGrid(links, 'linksList', 'links');
-      renderCategoryGrid(materials, 'materialsList', 'materials');
-    }
-
-    renderAllCategories();
-
-    // Listen for storage changes
-    window.addEventListener('storage', () => {
-      renderAllCategories();
-    });
-  </script>
+// ===== INIT =====
+initSemTabs();
+initSubjectTabs();
+renderContentForm();
+renderContentList();
+updateStats();
+</script>
 </body>
 </html>

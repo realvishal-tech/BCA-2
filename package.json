@@ -1,21 +1,17 @@
 {
-  "name": "study-portal",
-  "version": "1.0.0",
-  "description": "A simple study portal with user and admin dashboards",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
-  },
+  "name": "bca-study-hub",
+  "version": "2.0.0",
+  "description": "BCA Study Hub — All-in-one study platform for Babasaheb Bhim Rao Ambedkar Bihar University BCA students. Pure HTML/CSS/JS frontend, no backend required.",
   "keywords": [
+    "bca",
     "study",
-    "portal",
-    "dashboard",
-    "admin"
+    "hub",
+    "notes",
+    "pyqs",
+    "videos",
+    "BBRABU"
   ],
-  "author": "Study Portal Team",
+  "author": "BCA Study Hub",
   "license": "MIT",
-  "engines": {
-    "node": ">=14.0.0"
-  }
+  "homepage": "."
 }

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BCA Study Hub | Subject</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .notes-text { font-size:0.9rem; line-height:1.85; color:var(--text-2); }
+    .notes-text p { margin-bottom:10px; }
+    .kw-search-hl { background:#fde68a; color:#1e293b; border-radius:2px; padding:0 2px; }
+    .subject-header-bar {
+      background:var(--surface); border-bottom:1px solid var(--border);
+      padding:16px clamp(16px,5vw,80px);
+      display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    }
+    .complete-btn { display:flex; align-items:center; gap:6px; }
+    .anno-bar {
+      display:none; position:fixed; z-index:4500;
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius-sm); box-shadow:var(--shadow-md);
+      padding:8px 12px; gap:8px; flex-wrap:wrap;
+    }
+    .anno-bar.show { display:flex; }
+    .anno-btn { padding:5px 10px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--surface-2); font-size:0.78rem; cursor:pointer; }
+    .anno-btn:hover { border-color:var(--primary); color:var(--primary); }
+    .multi-study-tabs { display:none; }
+    .multi-study-tabs.show { display:flex; }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <a href="index.html" class="nav-brand">
+    <span class="nav-brand-icon">📚</span>
+    <span class="nav-brand-text">BCA Study Hub</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">🏠 Home</a>
+    <a href="#" id="navSemLink" class="nav-link">📖 Semester</a>
+  </div>
+  <div class="nav-actions">
+    <div class="nav-search-wrap">
+      <span class="nav-search-icon">🔍</span>
+      <input type="text" class="nav-search" id="navSearch" placeholder="Search subjects..." autocomplete="off"/>
+    </div>
+    <button class="btn-icon-nav dark-toggle-btn" title="Toggle Theme">☀️</button>
+    <button class="btn-icon-nav voice-cmd-btn" title="Voice Command">🎤</button>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="search-results-drop" id="searchResultsDrop"></div>
+<nav class="mobile-nav" id="mobileNav">
+  <a href="index.html" class="nav-link">🏠 Home</a>
+  <a href="#" id="mobileNavSemLink" class="nav-link">📖 Semester</a>
+  <hr class="divider"/>
+  <button class="nav-link w-full" style="background:none;border:none;text-align:left;" onclick="toggleDarkMode()">🌙 Toggle Theme</button>
+  <button class="nav-link w-full" style="background:none;border:none;text-align:left;" onclick="startVoiceCommand()">🎤 Voice Command</button>
+</nav>
+
+<!-- Subject Header Bar -->
+<div class="subject-header-bar">
+  <div style="flex:1;min-width:0;">
+    <div id="subjectBreadcrumb" style="font-size:0.75rem;color:var(--text-3);margin-bottom:4px;"></div>
+    <h1 id="subjectTitle" style="font-size:1.2rem;font-weight:700;line-height:1.3;"></h1>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+    <button class="btn btn-secondary btn-sm complete-btn" id="completeBtn">✅ Mark Complete</button>
+    <button class="btn btn-secondary btn-sm" id="bookmarkBtn">🔖 Bookmark</button>
+    <button class="btn btn-secondary btn-sm" onclick="printNotes()">🖨️ Print</button>
+    <button class="btn btn-secondary btn-sm" id="examModeBtn">🎯 Exam Mode</button>
+    <button class="btn btn-secondary btn-sm" id="ttsBtn">�� Listen</button>
+  </div>
+</div>
+
+<!-- ===== TAB BAR ===== -->
+<div class="tab-bar" id="subjectTabBar">
+  <button class="tab-btn active" data-tab="notes">📝 Notes</button>
+  <button class="tab-btn" data-tab="pyqs">📄 PYQs</button>
+  <button class="tab-btn" data-tab="videos">🎥 Videos</button>
+  <button class="tab-btn" id="programsTab" data-tab="programs" style="display:none;">💻 Programs</button>
+  <button class="tab-btn" id="labTab" data-tab="lab" style="display:none;">🧪 Lab</button>
+</div>
+
+<!-- Subject Tools Bar -->
+<div class="subject-tools">
+  <!-- Search within content -->
+  <div style="position:relative;">
+    <input type="text" id="contentSearch" placeholder="🔍 Search in content..." style="padding:6px 12px 6px 30px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:0.8rem;outline:none;width:200px;" autocomplete="off"/>
+    <span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:0.8rem;pointer-events:none;">🔍</span>
+  </div>
+  <button class="tool-btn" id="ttsPlayBtn">🔊 Listen</button>
+  <button class="tool-btn" id="ttsPauseBtn">⏸️ Pause</button>
+  <button class="tool-btn" id="ttsStopBtn">⏹️ Stop</button>
+  <button class="tool-btn" id="highlightModeBtn">��️ Highlight</button>
+  <button class="tool-btn" id="randomQBtn">🎲 Random Q</button>
+  <button class="tool-btn" id="examBtn2">�� Exam Mode</button>
+</div>
+
+<!-- Revision Alert -->
+<div id="subRevisionAlert" style="display:none;padding:10px clamp(16px,5vw,80px);background:rgba(249,115,22,0.1);border-bottom:1px solid rgba(249,115,22,0.25);">
+  <div style="font-size:0.82rem;color:#c2410c;">🔁 <strong>Revision scheduled</strong> — <span id="subRevisionText"></span></div>
+</div>
+
+<!-- ===== TAB CONTENTS ===== -->
+<div id="notesTab" class="tab-content active">
+  <!-- Notes keyword search results -->
+  <div id="notesSearchInfo" style="display:none;background:rgba(79,70,229,0.1);border:1px solid rgba(79,70,229,0.25);border-radius:var(--radius-sm);padding:8px 14px;margin-bottom:16px;font-size:0.82rem;">
+    Found matches for: <strong id="notesSearchTerm"></strong> — <button onclick="clearContentSearch()" style="background:none;border:none;color:var(--primary);cursor:pointer;font-size:0.82rem;">Clear</button>
+  </div>
+  <div class="content-grid" id="notesList"></div>
+</div>
+
+<div id="pyqsTab" class="tab-content">
+  <div class="content-grid" id="pyqsList"></div>
+</div>
+
+<div id="videosTab" class="tab-content">
+  <div class="content-grid" id="videosList"></div>
+</div>
+
+<div id="programsTab2" class="tab-content">
+  <div class="content-grid" id="programsList"></div>
+</div>
+
+<div id="labTab2" class="tab-content">
+  <div class="content-grid" id="labList"></div>
+</div>
+
+<!-- ===== ANNOTATION BAR ===== -->
+<div class="anno-bar" id="annoBar">
+  <button class="anno-btn" id="highlightBtn">🟡 Highlight</button>
+  <button class="anno-btn" id="clearHighlightBtn">🗑️ Clear</button>
+  <button class="anno-btn" id="dismissAnnoBar">✕</button>
+</div>
+
+<!-- ===== RANDOM Q POPUP ===== -->
+<div id="randomQSection" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:4000;width:min(520px,92vw);">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px;box-shadow:var(--shadow-lg);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div style="font-size:1rem;font-weight:700;">🎲 Practice Question</div>
+      <button onclick="closeRandomQSub()" style="background:none;border:none;font-size:1.2rem;color:var(--text-3);cursor:pointer;">✕</button>
+    </div>
+    <div id="randomQContent"></div>
+    <div style="margin-top:16px;display:flex;gap:10px;">
+      <button class="btn btn-primary btn-sm" onclick="showRandomQSub()">🔄 Next</button>
+      <button class="btn btn-secondary btn-sm" onclick="closeRandomQSub()">Close</button>
+    </div>
+  </div>
+</div>
+<div id="randomQOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3999;" onclick="closeRandomQSub()"></div>
+
+<!-- Suggestion Modal -->
+<div class="modal-overlay" id="suggestionOverlay">
+  <div class="modal" id="suggestionModal">
+    <div class="modal-header">
+      <div class="modal-title">💬 Send Suggestion</div>
+      <button class="modal-close close-suggestion-modal">✕</button>
+    </div>
+    <form id="suggestionForm">
+      <div class="form-field"><label>Name (optional)</label><input type="text" id="sugName" placeholder="Your name..." autocomplete="off"/></div>
+      <div class="form-field"><label>Message *</label><textarea id="sugMessage" placeholder="Your suggestion..." required></textarea></div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary close-suggestion-modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Send ✉️</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Voice Command Overlay -->
+<div class="voice-listening" id="voiceListeningOverlay">
+  <div class="voice-mic-icon">🎤</div>
+  <div class="voice-status">Listening...</div>
+</div>
+
+<!-- FAB -->
+<button class="fab-suggestion open-suggestion-modal" aria-label="Send Suggestion">💬 <span class="fab-text">Suggest</span></button>
+
+<script src="script.js"></script>
+<script>
+// ===== SUBJECT PAGE JS =====
+const semNum = parseInt(getParam('sem') || '1');
+const subCode = getParam('sub') || '';
+const semData = SEMESTERS[semNum];
+const subjectData = semData?.subjects.find(s => s.code === subCode);
+
+if (!semData || !subjectData) { window.location.href = 'index.html'; }
+
+let highlightMode = false;
+let currentSearchTerm = '';
+
+// Track visit
+trackVisit(subCode);
+
+// Update nav & header
+document.title = `BCA Study Hub | ${subCode} ${subjectData.name}`;
+document.getElementById('navSemLink').href = `semester.html?sem=${semNum}`;
+document.getElementById('navSemLink').textContent = `📖 ${semData.name}`;
+document.getElementById('mobileNavSemLink').href = `semester.html?sem=${semNum}`;
+document.getElementById('mobileNavSemLink').textContent = `📖 ${semData.name}`;
+
+document.getElementById('subjectBreadcrumb').innerHTML = `<a href="index.html">Home</a> › <a href="semester.html?sem=${semNum}">${semData.name}</a> › ${subCode}`;
+document.getElementById('subjectTitle').innerHTML = `${subjectData.icon} ${subCode}: ${subjectData.name}`;
+
+// Show programs/lab tabs if applicable
+if (subjectData.hasPrograms) { document.getElementById('programsTab').style.display = ''; }
+if (subjectData.hasLab) { document.getElementById('labTab').style.display = ''; }
+
+// ===== TAB SWITCHING =====
+const tabBtns = document.querySelectorAll('#subjectTabBar .tab-btn');
+const tabContents = { notes: 'notesTab', pyqs: 'pyqsTab', videos: 'videosTab', programs: 'programsTab2', lab: 'labTab2' };
+
+tabBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    tabBtns.forEach(b => b.classList.remove('active'));
+    Object.values(tabContents).forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('active'); });
+    btn.classList.add('active');
+    const tab = btn.dataset.tab;
+    const el = document.getElementById(tabContents[tab]);
+    if (el) el.classList.add('active');
+  });
+});
+
+// ===== LOAD CONTENT =====
+function getSubContent() { return getSubjectContent(subCode); }
+
+function renderNotes() {
+  const content = getSubContent();
+  const list = document.getElementById('notesList');
+  const items = content.notes || [];
+  if (items.length === 0) {
+    list.innerHTML = renderEmpty('📝', 'No notes available yet', 'Admin will add notes soon. Check back later.');
+    return;
+  }
+  list.innerHTML = '';
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'content-card';
+    const text = item.text || item.desc || '';
+    card.innerHTML = `
+      <div class="content-card-header">
+        <div class="content-card-icon">📝</div>
+        <div class="content-card-meta">
+          <div class="content-card-title">${escHtml(item.title)}</div>
+          <div class="content-card-type">Study Note</div>
+        </div>
+      </div>
+      ${text ? `<div class="content-card-desc notes-text" id="noteText_${item.id}">${applyKeywordDefs(escHtml(text))}</div>` : ''}
+      <div class="content-card-actions">
+        ${item.url ? `<a href="${item.url}" target="_blank" rel="noopener" class="btn btn-primary btn-sm">�� Open</a>` : ''}
+        <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('${escJs(item.title + (text ? ': ' + text : ''))}', this)">📋 Copy</button>
+        ${item.url ? `<a href="${item.url}" download class="btn btn-accent btn-sm">📥 Download</a>` : ''}
+      </div>
+    `;
+    if (text) { initKeywordDefs(card.querySelector('.notes-text')); }
+    list.appendChild(card);
+  });
+}
+
+function renderPYQs() {
+  const content = getSubContent();
+  const list = document.getElementById('pyqsList');
+  const items = content.pyqs || [];
+  if (items.length === 0) {
+    list.innerHTML = renderEmpty('📄', 'No PYQs available yet', 'Previous year questions will be added by admin soon.');
+    return;
+  }
+  list.innerHTML = '';
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'content-card';
+    card.innerHTML = `
+      <div class="content-card-header">
+        <div class="content-card-icon">📄</div>
+        <div class="content-card-meta">
+          <div class="content-card-title">${escHtml(item.title)}</div>
+          <div class="content-card-type">PYQ ${item.year ? '— ' + item.year : ''}</div>
+        </div>
+      </div>
+      ${item.desc ? `<div class="content-card-desc">${escHtml(item.desc)}</div>` : ''}
+      ${item.questions ? `<div style="font-size:0.83rem;color:var(--text-2);line-height:2;margin-bottom:14px;">${item.questions.split('\n').map((q,i) => q.trim() ? `<div style="padding:6px 0;border-bottom:1px solid var(--border);"><strong>Q${i+1}.</strong> ${escHtml(q.trim())}</div>` : '').join('')}</div>` : ''}
+      <div class="content-card-actions">
+        ${item.url && item.url !== '#' ? `<a href="${item.url}" target="_blank" rel="noopener" class="btn btn-primary btn-sm">🔗 Open</a>` : ''}
+        ${item.url && item.url !== '#' ? `<a href="${item.url}" download class="btn btn-accent btn-sm">📥 Download</a>` : ''}
+        <button class="btn btn-secondary btn-sm" onclick="copyToClipboard(${JSON.stringify(item.title + (item.questions ? '\n' + item.questions : ''))}, this)">📋 Copy</button>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function renderVideos() {
+  const content = getSubContent();
+  const list = document.getElementById('videosList');
+  const items = content.videos || [];
+  if (items.length === 0) {
+    list.innerHTML = renderEmpty('🎥', 'No videos available yet', 'Video lectures will be added by admin soon.');
+    return;
+  }
+  list.innerHTML = '';
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'content-card';
+    const ytId = item.youtubeId || extractYTId(item.url || '');
+    card.innerHTML = `
+      ${ytId ? `<div class="video-embed-wrap"><iframe src="https://www.youtube.com/embed/${ytId}" title="${escHtml(item.title)}" allowfullscreen loading="lazy"></iframe></div>` : ''}
+      <div class="content-card-header">
+        <div class="content-card-icon">🎥</div>
+        <div class="content-card-meta">
+          <div class="content-card-title">${escHtml(item.title)}</div>
+          <div class="content-card-type">Video Lecture</div>
+        </div>
+      </div>
+      ${item.desc ? `<div class="content-card-desc">${escHtml(item.desc)}</div>` : ''}
+      <div class="content-card-actions">
+        ${ytId ? `<a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener" class="btn btn-primary btn-sm">▶️ Watch on YouTube</a>` : ''}
+        ${item.url && !ytId ? `<a href="${item.url}" target="_blank" rel="noopener" class="btn btn-primary btn-sm">🔗 Open Video</a>` : ''}
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function renderPrograms() {
+  const content = getSubContent();
+  const list = document.getElementById('programsList');
+  const items = content.programs || [];
+  if (items.length === 0) {
+    list.innerHTML = renderEmpty('💻', 'No programs available yet', 'Programs will be added by admin soon.');
+    return;
+  }
+  list.innerHTML = '';
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'content-card';
+    card.innerHTML = `
+      <div class="content-card-header">
+        <div class="content-card-icon">💻</div>
+        <div class="content-card-meta">
+          <div class="content-card-title">${escHtml(item.title)}</div>
+          <div class="content-card-type">Program</div>
+        </div>
+      </div>
+      ${item.desc ? `<div class="content-card-desc">${escHtml(item.desc)}</div>` : ''}
+      ${item.code ? `<div class="code-block-wrap"><pre class="code-block" id="code_${item.id}">${escHtml(item.code)}</pre><button class="code-copy-btn" onclick="copyToClipboard(${JSON.stringify(item.code)}, this)">📋 Copy</button></div>` : ''}
+      <div class="content-card-actions">
+        ${item.url ? `<a href="${item.url}" target="_blank" class="btn btn-primary btn-sm">🔗 View</a>` : ''}
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function renderLab() {
+  const content = getSubContent();
+  const list = document.getElementById('labList');
+  const items = content.lab || [];
+  if (items.length === 0) {
+    list.innerHTML = renderEmpty('🧪', 'No lab work available yet', 'Lab exercises will be added by admin soon.');
+    return;
+  }
+  list.innerHTML = '';
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'content-card';
+    card.innerHTML = `
+      <div class="content-card-header">
+        <div class="content-card-icon">🧪</div>
+        <div class="content-card-meta">
+          <div class="content-card-title">${escHtml(item.title)}</div>
+          <div class="content-card-type">Lab Exercise</div>
+        </div>
+      </div>
+      ${item.desc ? `<div class="content-card-desc">${escHtml(item.desc)}</div>` : ''}
+      ${item.code ? `<div class="code-block-wrap"><pre class="code-block">${escHtml(item.code)}</pre><button class="code-copy-btn" onclick="copyToClipboard(${JSON.stringify(item.code)}, this)">📋 Copy</button></div>` : ''}
+    `;
+    list.appendChild(card);
+  });
+}
+
+function renderAllContent() {
+  renderNotes();
+  renderPYQs();
+  renderVideos();
+  renderPrograms();
+  renderLab();
+}
+
+function renderEmpty(icon, title, desc) {
+  return `<div class="empty-state" style="grid-column:1/-1;"><div class="empty-state-icon">${icon}</div><div class="empty-state-title">${title}</div><div class="empty-state-desc">${desc}</div></div>`;
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escJs(str) {
+  if (!str) return '';
+  return String(str).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n').replace(/"/g,'\\"');
+}
+function extractYTId(url) {
+  if (!url) return '';
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&\n?#]+)/);
+  return m ? m[1] : '';
+}
+
+// ===== COMPLETE / BOOKMARK BUTTONS =====
+function updateCompleteBtn() {
+  const btn = document.getElementById('completeBtn');
+  if (!btn) return;
+  if (isCompleted(subCode)) {
+    btn.innerHTML = '✅ Completed'; btn.style.color = 'var(--accent)'; btn.style.borderColor = 'var(--accent)';
+  } else {
+    btn.innerHTML = '⬜ Mark Complete'; btn.style.color = ''; btn.style.borderColor = '';
+  }
+}
+function updateBookmarkBtn() {
+  const btn = document.getElementById('bookmarkBtn');
+  if (!btn) return;
+  if (isBookmarked(subCode)) {
+    btn.innerHTML = '🔖 Bookmarked'; btn.style.color = 'var(--primary)'; btn.style.borderColor = 'var(--primary)';
+  } else {
+    btn.innerHTML = '☆ Bookmark'; btn.style.color = ''; btn.style.borderColor = '';
+  }
+}
+
+document.getElementById('completeBtn').addEventListener('click', () => {
+  const wasCompleted = isCompleted(subCode);
+  setProgress(subCode, !wasCompleted);
+  if (!wasCompleted) {
+    scheduleRevision(subCode, subjectData.name);
+    showToast(`✅ ${subjectData.name} marked complete! Revision scheduled.`, 'success');
+    // Show revision info
+    const revAlert = document.getElementById('subRevisionAlert');
+    const revText = document.getElementById('subRevisionText');
+    if (revAlert && revText) {
+      revAlert.style.display = 'block';
+      revText.textContent = 'Day 1, Day 3, and Day 7 revision scheduled';
+    }
+  } else {
+    showToast('Marked as incomplete', 'info');
+  }
+  updateCompleteBtn();
+});
+
+document.getElementById('bookmarkBtn').addEventListener('click', () => {
+  toggleBookmark(subCode);
+  updateBookmarkBtn();
+});
+
+// ===== TTS CONTROLS =====
+function getNotesText() {
+  const content = getSubContent();
+  const notes = content.notes || [];
+  if (!notes.length) return subjectData.name + ' has no notes available yet.';
+  return notes.map(n => n.title + '. ' + (n.text || n.desc || '')).join('. ');
+}
+
+document.getElementById('ttsBtn').addEventListener('click', () => { ttsSpeak(getNotesText()); });
+document.getElementById('ttsPlayBtn').addEventListener('click', () => {
+  if (window.speechSynthesis.speaking) { ttsPause(); }
+  else { ttsSpeak(getNotesText()); }
+});
+document.getElementById('ttsPauseBtn').addEventListener('click', ttsPause);
+document.getElementById('ttsStopBtn').addEventListener('click', ttsStop);
+
+// ===== EXAM MODE =====
+function buildExamContent() {
+  const content = getSubContent();
+  const pyqs = content.pyqs || [];
+  if (!pyqs.length) return '<div class="empty-state"><div class="empty-state-icon">📄</div><div class="empty-state-title">No PYQs</div><div class="empty-state-desc">No questions available for exam mode. Check back later.</div></div>';
+  return pyqs.map(q => `<div style="padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;"><strong>${escHtml(q.title)}</strong>${q.questions ? '<div style="margin-top:8px;font-size:0.88rem;color:var(--text-2);">' + escHtml(q.questions) + '</div>' : ''}</div>`).join('');
+}
+document.getElementById('examModeBtn').addEventListener('click', () => enterExamMode(buildExamContent()));
+document.getElementById('examBtn2').addEventListener('click', () => enterExamMode(buildExamContent()));
+
+// ===== HIGHLIGHT MODE =====
+const annoBar = document.getElementById('annoBar');
+let selection = null;
+
+document.getElementById('highlightModeBtn').addEventListener('click', () => {
+  highlightMode = !highlightMode;
+  document.getElementById('highlightModeBtn').classList.toggle('active', highlightMode);
+  showToast(highlightMode ? '🖊️ Highlight mode ON — select text to highlight' : 'Highlight mode OFF', 'info');
+});
+
+document.addEventListener('mouseup', (e) => {
+  if (!highlightMode) return;
+  selection = window.getSelection();
+  if (!selection || selection.isCollapsed) { annoBar.classList.remove('show'); return; }
+  const rect = selection.getRangeAt(0).getBoundingClientRect();
+  annoBar.style.left = Math.min(e.clientX, window.innerWidth - 200) + 'px';
+  annoBar.style.top = (window.scrollY + rect.top - 48) + 'px';
+  annoBar.classList.add('show');
+});
+
+document.getElementById('highlightBtn').addEventListener('click', () => {
+  if (!selection || selection.isCollapsed) return;
+  const range = selection.getRangeAt(0);
+  const span = document.createElement('mark');
+  span.className = 'user-highlight';
+  try { range.surroundContents(span); } catch(e) {}
+  selection.removeAllRanges();
+  annoBar.classList.remove('show');
+  showToast('Text highlighted!', 'success');
+});
+
+document.getElementById('clearHighlightBtn').addEventListener('click', () => {
+  document.querySelectorAll('mark.user-highlight').forEach(m => {
+    const parent = m.parentNode;
+    while (m.firstChild) parent.insertBefore(m.firstChild, m);
+    parent.removeChild(m);
+  });
+  annoBar.classList.remove('show');
+  showToast('Highlights cleared', 'info');
+});
+
+document.getElementById('dismissAnnoBar').addEventListener('click', () => { annoBar.classList.remove('show'); });
+
+// ===== CONTENT SEARCH (KEYWORD HIGHLIGHT) =====
+document.getElementById('contentSearch').addEventListener('input', function() {
+  const q = this.value.trim();
+  currentSearchTerm = q;
+  if (!q) { clearContentSearch(); return; }
+  const info = document.getElementById('notesSearchInfo');
+  const term = document.getElementById('notesSearchTerm');
+  if (info && term) { info.style.display = 'block'; term.textContent = q; }
+  // Highlight in notes
+  document.querySelectorAll('.content-card-desc, .content-card-title, .code-block').forEach(el => {
+    el.innerHTML = highlightKeyword(el.textContent || el.innerText, q);
+  });
+  // Scroll to first match
+  const first = document.querySelector('.kw-search-highlight');
+  if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
+function clearContentSearch() {
+  document.getElementById('contentSearch').value = '';
+  document.getElementById('notesSearchInfo').style.display = 'none';
+  currentSearchTerm = '';
+  renderAllContent();
+}
+
+// ===== RANDOM Q =====
+function showRandomQSub() {
+  const q = getRandomQuestion();
+  document.getElementById('randomQSection').style.display = 'block';
+  document.getElementById('randomQOverlay').style.display = 'block';
+  document.getElementById('randomQContent').innerHTML = `
+    <div style="background:var(--surface-2);border-radius:var(--radius);padding:16px;margin-bottom:12px;font-size:0.92rem;font-weight:500;line-height:1.7;">${q.q}</div>
+    <div style="font-size:0.8rem;color:var(--text-3);">📚 ${q.subject} | Sem ${q.sem}</div>`;
+}
+function closeRandomQSub() {
+  document.getElementById('randomQSection').style.display = 'none';
+  document.getElementById('randomQOverlay').style.display = 'none';
+}
+document.getElementById('randomQBtn').addEventListener('click', showRandomQSub);
+
+// ===== CHECK REVISION =====
+function checkSubRevision() {
+  const revisions = getRevisions();
+  const due = revisions.filter(r => r.code === subCode && r.dueDate <= Date.now() + 12*60*60*1000);
+  if (due.length > 0) {
+    const alert = document.getElementById('subRevisionAlert');
+    const text = document.getElementById('subRevisionText');
+    if (alert && text) { alert.style.display = 'block'; text.textContent = 'Revision scheduled for today!'; }
+  }
+}
+
+// ===== INIT =====
+updateCompleteBtn();
+updateBookmarkBtn();
+renderAllContent();
+checkSubRevision();
+restoreScrollPos('sub-' + subCode);
+window.addEventListener('scroll', () => saveScrollPos('sub-' + subCode));
+</script>
+</body>
+</html>
